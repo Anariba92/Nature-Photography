@@ -30,20 +30,27 @@
             </div>
 
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
-                <details class="group bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer">
-  <summary class="list-none">
-    <img src="img/Pino.jpg" alt="Pino" class="w-full h-64 object-cover">
-    <div class="p-4 bg-gray-50 border-t flex justify-between items-center">
-      <span class="font-bold text-green-700">Ver información del Pino</span>
-      <span class="text-xs text-gray-400">Haz clic para leer más</span>
+        <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
+  <div class="relative w-full h-full duration-500 [transform-style:preserve-3d] group-[.flipped]:[transform:rotateY(180deg)]">
+    
+    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+      <img src="img/Pino.jpg" alt="Pino" class="w-full h-full object-cover rounded-xl shadow-xl">
+      <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+        Click para info ↺
+      </div>
     </div>
-  </summary>
-  
-  <div class="p-6 bg-white text-gray-700 border-t">
-    <h3 class="text-xl font-bold mb-2 text-green-800">Sobre este Pino</h3>
-    <p>Este ejemplar es un símbolo de resistencia en nuestra zona...</p>
+
+    <div class="absolute inset-0 w-full h-full bg-green-800 text-white p-8 rounded-xl shadow-xl [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
+      <h3 class="text-2xl font-bold mb-4 italic">Sobre esta captura</h3>
+      <p class="text-lg leading-relaxed">
+        Esta fotografía de un Pino fue tomada en el bosque local durante el amanecer. 
+        Representa la fuerza y la calma de la naturaleza.
+      </p>
+      <button class="mt-6 text-sm underline opacity-80">Volver a la foto</button>
+    </div>
+
   </div>
-</details>
+</div>
                 <div class="p-4">
                     <span class="text-xs font-bold text-green-600 uppercase">Abraza un árbol</span>
                     <h3 class="text-lg font-bold">Vista</h3>
