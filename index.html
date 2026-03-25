@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .photo-card:hover img { transform: scale(1.05); transition: 0.3s; }
-        /* Estilo para el giro */
         .flipped .inner-card { transform: rotateY(180deg); }
     </style>
 </head>
@@ -25,26 +24,18 @@
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
                 <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
                     <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        
                         <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                             <img src="img/mariposa.jpg" alt="mariposa" class="w-full h-full object-cover">
-                            
                             <button onclick="event.stopPropagation(); openImage('img/mariposa.jpg')" class="absolute top-3 right-3 bg-black/40 hover:bg-green-600 backdrop-blur-md text-white p-2 rounded-full transition-all z-10">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                 </svg>
                             </button>
-
-                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">
-                                Click para info ↺
-                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">Click para info ↺</div>
                         </div>
-
                         <div class="absolute inset-0 w-full h-full bg-green-800 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
                             <h3 class="text-xl font-bold mb-2 italic">Mariposa "Búho"</h3>
-                            <p class="text-sm leading-relaxed">
-                                Presenta grandes manchas oculares en sus alas que asemejan los ojos de un búho para ahuyentar depredadores.
-                            </p>
+                            <p class="text-sm leading-relaxed">Presenta grandes manchas oculares en sus alas que asemejan los ojos de un búho para ahuyentar depredadores.</p>
                             <span class="mt-4 text-xs underline opacity-70">Toca para volver</span>
                         </div>
                     </div>
@@ -59,26 +50,18 @@
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
                 <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
                     <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        
                         <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                             <img src="img/Pino.jpg" alt="Pino" class="w-full h-full object-cover">
-                            
                             <button onclick="event.stopPropagation(); openImage('img/Pino.jpg')" class="absolute top-3 right-3 bg-black/40 hover:bg-green-600 backdrop-blur-md text-white p-2 rounded-full transition-all z-10">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                 </svg>
                             </button>
-
-                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">
-                                Click para info ↺
-                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">Click para info ↺</div>
                         </div>
-
                         <div class="absolute inset-0 w-full h-full bg-green-800 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
                             <h3 class="text-xl font-bold mb-2 italic">Liquidámbar</h3>
-                            <p class="text-sm leading-relaxed">
-                                Árbol caducifolio famoso por sus hojas que cambian a rojos intensos. Tiene propiedades medicinales.
-                            </p>
+                            <p class="text-sm leading-relaxed">Árbol caducifolio famoso por sus hojas que cambian a rojos intensos. Tiene propiedades medicinales.</p>
                             <span class="mt-4 text-xs underline opacity-70">Toca para volver</span>
                         </div>
                     </div>
@@ -90,77 +73,30 @@
                 </div>
             </div>
 
-        </div>
-        <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
+            <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
                 <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
                     <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        
                         <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
                             <img src="img/flor.jpg" alt="Árbol Cortés" class="w-full h-full object-cover">
-                            
-                            <button onclick="event.stopPropagation(); openImage('img/helecho.jpg')" class="absolute top-3 right-3 bg-black/40 hover:bg-green-600 backdrop-blur-md text-white p-2 rounded-full transition-all z-10">
+                            <button onclick="event.stopPropagation(); openImage('img/flor.jpg')" class="absolute top-3 right-3 bg-black/40 hover:bg-green-600 backdrop-blur-md text-white p-2 rounded-full transition-all z-10">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                 </svg>
                             </button>
-
-                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">
-                                Click para info ↺
-                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">Click para info ↺</div>
                         </div>
-
                         <div class="absolute inset-0 w-full h-full bg-green-800 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
                             <h3 class="text-xl font-bold mb-2 italic">Árbol de Cortés</h3>
-                            <p class="text-sm leading-relaxed">
-                                El árbol de Cortés y su peculiar y llamativa flor amarilla lo caracteriza en epoca de verano.
-                            </p>
+                            <p class="text-sm leading-relaxed">Su peculiar y llamativa flor amarilla lo caracteriza en época de verano, vistiendo paisajes enteros de color oro.</p>
                             <span class="mt-4 text-xs underline opacity-70">Toca para volver</span>
                         </div>
                     </div>
                 </div>
                 <div class="p-4">
                     <span class="text-xs font-bold text-green-600 uppercase">Flora</span>
-                    <h3 class="text-lg font-bold">Cortés/h3>
+                    <h3 class="text-lg font-bold">Árbol de Cortés</h3>
                     <p class="text-sm text-stone-600">Árbol caducifolio.</p>
                 </div>
             </div>
-    </main>
 
-    <div id="imageModal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-4 cursor-pointer" onclick="closeImage()">
-        <span class="absolute top-6 right-6 text-white text-4xl">&times;</span>
-        <img id="fullImage" src="" class="max-w-full max-h-full rounded-lg shadow-2xl transition-all transform scale-95">
-    </div>
-
-    <footer class="bg-green-900 text-white py-12 mt-20">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-2xl font-bold mb-4 italic">Naturaleza en Lente</h2>
-            <div class="flex justify-center space-x-6 mb-8">
-                <a href="https://www.instagram.com/anariba_sergio" target="_blank" class="hover:text-green-400">Instagram</a>
-                <a href="https://www.facebook.com/share/1G5hWmUMac/" target="_blank" class="hover:text-green-400">Facebook</a>
-                <a href="https://wa.me/50498016267" target="_blank" class="hover:text-green-400">WhatsApp</a>
-            </div>
-            <p class="text-sm opacity-50">&copy; 2026 Nature Photography</p>
         </div>
-    </footer>
-
-    <a href="https://wa.me/50498016267" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-2xl z-50">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.888 11.888-11.888 3.176 0 6.161 1.237 8.404 3.48s3.48 5.228 3.48 8.404c0 6.556-5.332 11.888-11.888 11.888-2.01 0-3.984-.509-5.733-1.477l-6.25 1.639zm6.39-4.331c1.556.924 3.19 1.413 4.887 1.413 5.3 0 9.613-4.313 9.613-9.613 0-2.568-1.001-4.982-2.817-6.799s-4.231-2.817-6.799-2.817c-5.3 0-9.613 4.313-9.613 9.613 0 1.815.512 3.522 1.48 4.982l-.986 3.598 3.735-.977z"/></svg>
-    </a>
-
-    <script>
-        function openImage(src) {
-            const modal = document.getElementById('imageModal');
-            const img = document.getElementById('fullImage');
-            img.src = src;
-            modal.classList.remove('hidden');
-            setTimeout(() => img.classList.remove('scale-95'), 10);
-        }
-        function closeImage() {
-            const modal = document.getElementById('imageModal');
-            const img = document.getElementById('fullImage');
-            img.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-    </script>
-</body>
-</html>
