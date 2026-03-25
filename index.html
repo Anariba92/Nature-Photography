@@ -18,15 +18,33 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-4 pb-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
-               <img src="img/mariposa" alt="Pino" class="w-full h-full object-cover">
-                <div class="p-4">
-                    <span class="text-xs font-bold text-green-600 uppercase">Animales</span>
-                    <h3 class="text-lg font-bold">Mariposa Búho</h3>
-                    <p class="text-sm text-stone-600">Avistado en Tegucigalpa, Honduras. 2024.</p>
+           <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
+                <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
+                    <div class="relative w-full h-full duration-500 [transform-style:preserve-3d] group-[.flipped]:[transform:rotateY(180deg)]">
+                        
+                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+                            <img src="img/mariposa" alt="Pino" class="w-full h-full object-cover">
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">
+                                Click para info ↺
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-0 w-full h-full bg-green-800 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
+                            <h3 class="text-xl font-bold mb-2 italic">Liquidámbar</h3>
+                            <p class="text-sm leading-relaxed">
+                                Árbol caducifolio de hojas estrelladas que cambian a rojos intensos. Su resina tiene propiedades medicinales.
+                            </p>
+                            <span class="mt-4 text-xs underline opacity-70">Toca para volver</span>
+                        </div>
+                    </div>
                 </div>
+                <div class="p-4">
+                    <span class="text-xs font-bold text-green-600 uppercase">Abraza un árbol</span>
+                    <h3 class="text-lg font-bold">Liquidámbar</h3>
+                    <p class="text-sm text-stone-600">Árbol ornamental y medicinal.</p>
+                </div>
+            </div>
+
             </div>
 
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
