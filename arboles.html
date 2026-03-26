@@ -3,89 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum: Bosques | Exploraciones Naturales</title>
+    <title>Álbum: Bosques | Portafolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Efectos visuales de las tarjetas */
-        .photo-card:hover .img-container img { transform: scale(1.1); }
+        .photo-card:hover .img-container img { transform: scale(1.1); transition: 0.5s; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .img-container { overflow: hidden; }
-        .gallery-image { transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
+        .img-container { overflow: hidden; position: relative; }
+        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; }
         
-        /* Estilos para las flechas del Lightbox */
-        .lightbox-btn { opacity: 0; transition: opacity 0.3s, background-color 0.3s; }
-        #imageModal:hover .lightbox-btn { opacity: 1; }
+        /* Estilos del Modal (Forzados para que funcione) */
+        #imageModal {
+            display: none; /* Por defecto oculto */
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #fullImage {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
-<body class="bg-stone-100 text-stone-800 font-sans">
+<body class="bg-stone-100 text-stone-800">
 
-    <nav class="p-6 max-w-7xl mx-auto">
-        <a href="index.html" class="inline-flex items-center text-green-800 font-bold hover:text-green-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Volver al Inicio
-        </a>
-    </nav>
-
-    <header class="py-12 px-6 text-center">
-        <h1 class="text-5xl font-serif font-bold text-green-900 mb-3">Colección: Bosques</h1>
-        <p class="text-stone-500 italic text-lg">Majestuosos gigantes y paisajes de nuestra tierra.</p>
-        <div class="h-1.5 w-24 bg-green-600 mx-auto mt-6 rounded-full"></div>
+    <header class="py-10 text-center">
+        <h1 class="text-4xl font-serif font-bold text-green-900">Colección: Bosques</h1>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 pb-24">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
+            <div class="relative h-80 cursor-pointer" onclick="if(!event.target.closest('.nav-btn')) this.classList.toggle('flipped')">
+                <div class="inner-card relative w-full h-full">
+                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
+                        <img src="img/Pino.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
+                        <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center">
+                        <p>Información del Liquidámbar...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-800">Liquidámbar</div>
+        </div>
+
+        <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
+            <div class="relative h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="inner-card relative w-full h-full">
+                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
+                        <img src="img/bosque.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
+                        <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>Información del Pino Nacional.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-800">Pino</div>
+        </div>
+
+        <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
+            <div class="relative h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="inner-card relative w-full h-full">
+                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
+                        <img src="img/montaña.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
+                        <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>Información de la Montaña.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-800">Montaña</div>
+        </div>
+
+    </main>
+
+    <div id="imageModal" onclick="this.style.display='none'">
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer">&times;</span>
+        <img id="fullImage" src="">
+        <p class="text-white mt-4 italic">Haz clic en cualquier lugar para cerrar</p>
+    </div>
+
+    <script>
+        function showFull(boton) {
+            // Buscamos la imagen que está dentro de la misma tarjeta que el botón
+            const card = boton.closest('.photo-card');
+            const imagenEnTarjeta = card.querySelector('.active-img');
             
-            <div class="photo-card bg-white rounded-2xl overflow-hidden shadow-lg border border-stone-200 transition-all hover:shadow-2xl">
-                <div class="relative w-full h-96 cursor-pointer group" onclick="if(!event.target.closest('.gallery-dot')) this.classList.toggle('flipped')">
-                    <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                            <div class="absolute inset-0 w-full h-full">
-                                <img src="img/Pino.jpg" class="gallery-image absolute inset-0 w-full h-full object-cover scale-125 object-top opacity-100 z-10" data-gallery="liquidambar">
-                                <img src="img/bosque.jpg" class="gallery-image absolute inset-0 w-full h-full object-cover scale-150 opacity-0 z-0" data-gallery="liquidambar">
-                            </div>
-                            <button type="button" onclick="event.stopPropagation(); openLightbox(this, 0)" class="absolute top-4 right-4 bg-black/60 text-white p-2.5 rounded-full z-30 hover:bg-green-600 transition-colors shadow-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                            </button>
-                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2.5 z-30 bg-black/30 px-4 py-1.5 rounded-full backdrop-blur-sm">
-                                <button type="button" onclick="event.stopPropagation(); changeCardImage(this, 0)" class="gallery-dot w-3 h-3 rounded-full bg-white transition-all"></button>
-                                <button type="button" onclick="event.stopPropagation(); changeCardImage(this, 1)" class="gallery-dot w-3 h-3 rounded-full bg-white/40 transition-all"></button>
-                            </div>
-                            <div class="absolute bottom-5 left-5 bg-black/50 text-white px-3 py-1 rounded-full text-xs z-20 font-semibold tracking-wider">Info ↺</div>
-                        </div>
-                        <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
-                            <h3 class="text-2xl font-bold mb-3 italic">Liquidámbar Styraciflua</h3>
-                            <p class="text-sm leading-relaxed opacity-90">Árbol caducifolio famoso por sus hojas estrelladas que tornan a colores intensos en otoño. Alcanza entre 20 y 40 metros de altura.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-5 text-center border-t border-stone-100"><h3 class="font-bold text-green-800 text-lg">Liquidámbar</h3></div>
-            </div>
-
-            <div class="photo-card bg-white rounded-2xl overflow-hidden shadow-lg border border-stone-200 transition-all hover:shadow-2xl">
-                <div class="relative w-full h-96 cursor-pointer group" onclick="this.classList.toggle('flipped')">
-                    <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                            <img src="img/bosque.jpg" class="gallery-image absolute inset-0 w-full h-full object-cover scale-150 object-center opacity-100 z-10" data-gallery="pino">
-                            <button type="button" onclick="event.stopPropagation(); openLightbox(this, 0)" class="absolute top-4 right-4 bg-black/60 text-white p-2.5 rounded-full z-30 hover:bg-green-600 transition-colors shadow-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                            </button>
-                            <div class="absolute bottom-5 left-5 bg-black/50 text-white px-3 py-1 rounded-full text-xs z-20 font-semibold tracking-wider">Info ↺</div>
-                        </div>
-                        <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
-                            <h3 class="text-2xl font-bold mb-3 italic">Pinus sp.</h3>
-                            <p class="text-sm leading-relaxed opacity-90">Honduras cuenta con 7 especies de pino, siendo considerado nuestro Árbol Nacional por su importancia ecológica y económica.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-5 text-center border-t border-stone-100"><h3 class="font-bold text-green-800 text-lg">Pino Nacional</h3></div>
-            </div>
-
-            <div class="photo-card bg-white rounded-2xl overflow-hidden shadow-lg border border-stone-200 transition-all hover:shadow-2xl">
-                <div class="relative w-full h-96 cursor-pointer group" onclick="this.classList.toggle('flipped')">
-                    <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                            <img src="img/montaña.jpg" class="gallery-image absolute inset-0 w-full h-full object-cover scale-110 object-bottom opacity-100 z-10" data-gallery="montana">
-                            <button type="button" onclick="event.stopPropagation(); openLightbox(this, 0)" class="absolute top-4 right-4 bg-black/60 text-white p-2.5 rounded-full z-30 hover:bg-green-600 transition-colors shadow-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24
+            // Obtenemos el modal y la imagen del modal
+            const modal = document.getElementById('imageModal');
+            const fullImg = document.getElementById('fullImage');
+            
+            // Pasamos la ruta de la imagen
+            fullImg.src = imagenEnTarjeta.src;
+            
+            // Mostramos el modal usando estilo directo para evitar errores de Tailwind
+            modal.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
