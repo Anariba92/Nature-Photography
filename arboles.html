@@ -5,62 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Álbum Forestal Pro - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.4s ease; }
 
-        /* Efecto Flip */
         .photo-card { perspective: 1000px; }
         .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 380px; }
         .flipped .inner-card { transform: rotateY(180deg); }
         .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
         .front-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
 
-        /* Modal */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; }
-        #fullImage { max-width: 90%; max-height: 85vh; object-fit: contain; }
+        #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; }
 
         .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; padding: 12px; border-radius: 50%; cursor: pointer; z-index: 60; transition: 0.3s; border: none; }
         .nav-arrow:hover { background: #16a34a; scale: 1.1; }
         
         .hide-nav .nav-arrow, .hide-nav .dots-container { display: none !important; }
 
-        /* Botones Superiores */
-        .top-nav-btn {
-            background: white; color: #166534; padding: 10px 18px;
-            border-radius: 50px; font-weight: bold; display: flex; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s;
+        .top-nav-btn { background: white; color: #166534; padding: 10px 18px; border-radius: 50px; font-weight: bold; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s; }
+        
+        /* Estilo para el botón de descargar en el modal */
+        #downloadBtn {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #16a34a; color: white; padding: 10px 25px; border-radius: 50px;
+            font-weight: bold; cursor: pointer; z-index: 10000; transition: 0.3s;
         }
-        .top-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        .btn-donate { background: #166534; color: white; }
-        .btn-donate:hover { background: #15803d; color: white; }
+        #downloadBtn:hover { background: #15803d; transform: translateX(-50%) scale(1.05); }
     </style>
 </head>
 <body class="bg-stone-100 p-6 pt-24">
 
     <div class="fixed top-5 left-0 w-full px-6 flex justify-between items-center z-[100]">
-        <a href="index.html" class="top-nav-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Menú Principal
-        </a>
-
-        <a href="https://www.paypal.com" target="_blank" class="top-nav-btn btn-donate">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-            Apoyar Proyecto
-        </a>
+        <a href="index.html" class="top-nav-btn">❮ Menú</a>
+        <h2 class="hidden md:block font-serif text-green-900 font-bold uppercase tracking-widest">Patrimonio Natural</h2>
     </div>
 
-    <header class="max-w-7xl mx-auto mb-10 text-center">
-        <h1 class="text-3xl font-serif font-bold text-green-900 uppercase tracking-widest">Patrimonio Natural de Honduras</h1>
-        <p class="text-stone-500 italic mt-2">Documentación fotográfica de nuestra flora</p>
-    </header>
-
     <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-        
         <div class="photo-card" data-id="bosque">
             <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
@@ -69,11 +51,9 @@
                             <img src="img/Pino.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/hoja.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
                             <img src="img/tronco.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
-                            
                             <button onclick="moveImg(this, -1, event)" class="nav-arrow left-2">❮</button>
                             <button onclick="moveImg(this, 1, event)" class="nav-arrow right-2">❯</button>
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-
                             <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
                                 <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
                                 <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
@@ -83,7 +63,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
                     </div>
                     <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>El Liquidámbar destaca por sus hojas en forma de estrella y colores otoñales intensos.</p>
+                        <p>Hojas estrelladas y colores otoñales intensos.</p>
                     </div>
                 </div>
             </div>
@@ -96,11 +76,9 @@
                         <div class="img-container">
                             <img src="img/bosque.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/bellota.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
-                            
                             <button onclick="moveImg(this, -1, event)" class="nav-arrow left-2">❮</button>
                             <button onclick="moveImg(this, 1, event)" class="nav-arrow right-2">❯</button>
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-
                             <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
                                 <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
                                 <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
@@ -109,7 +87,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Pino en Honduras</div>
                     </div>
                     <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>El Pino (Pinus oocarpa) es el árbol nacional de Honduras, por su variedad y porque predomina en su territorio.</p>
+                        <p>Árbol nacional, símbolo de vigor y predominio territorial.</p>
                     </div>
                 </div>
             </div>
@@ -126,7 +104,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Montaña</div>
                     </div>
                     <div class="back-card bg-stone-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>Vista panorámica desde San Juancito, en Francisco Morazán.</p>
+                        <p>Vista panorámica desde San Juancito, Fco. Morazán.</p>
                     </div>
                 </div>
             </div>
@@ -137,6 +115,9 @@
         <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer">&times;</span>
         <button class="nav-arrow left-6 text-2xl" onclick="moveModal(-1, event)">❮</button>
         <img id="fullImage" src="" onclick="event.stopPropagation()">
+        
+        <button id="downloadBtn" onclick="askDonation(event)">Descargar esta Foto</button>
+        
         <button class="nav-arrow right-6 text-2xl" onclick="moveModal(1, event)">❯</button>
         <div id="counter" class="absolute bottom-8 text-white font-mono bg-black/40 px-4 py-1 rounded-full"></div>
     </div>
@@ -185,10 +166,6 @@
             const imgs = card.querySelectorAll('.preview-img');
             currentGallery = Array.from(imgs).map(img => img.src);
             imgs.forEach((img, i) => { if (img.style.opacity === "1") modalIdx = i; });
-            
-            const isMulti = currentGallery.length > 1;
-            document.querySelectorAll('#imageModal .nav-arrow, #counter').forEach(el => el.style.display = isMulti ? 'block' : 'none');
-            
             showModalImg();
             document.getElementById('imageModal').style.display = 'flex';
         }
@@ -202,6 +179,42 @@
         function showModalImg() {
             document.getElementById('fullImage').src = currentGallery[modalIdx];
             document.getElementById('counter').innerText = `${modalIdx + 1} / ${currentGallery.length}`;
+        }
+
+        // --- LÓGICA DE DONACIÓN Y DESCARGA ---
+        function askDonation(e) {
+            e.stopPropagation();
+            const imgUrl = document.getElementById('fullImage').src;
+
+            Swal.fire({
+                title: '¿Te gustaría apoyar este proyecto?',
+                text: "Si valoras estas fotografías de nuestra flora, considera una donación voluntaria. La descarga iniciará de cualquier forma.",
+                icon: 'heart',
+                showCancelButton: true,
+                confirmButtonColor: '#166534',
+                cancelButtonColor: '#78716c',
+                confirmButtonText: 'Sí, donar y descargar',
+                cancelButtonText: 'No, solo descargar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Abrir link de donación (ejemplo PayPal)
+                    window.open('https://www.paypal.com/donate?your-link-here', '_blank');
+                    // Iniciar descarga tras un segundo
+                    setTimeout(() => startDownload(imgUrl), 1000);
+                } else {
+                    // Solo descargar
+                    startDownload(imgUrl);
+                }
+            });
+        }
+
+        function startDownload(url) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Fotografia_Honduras.jpg'; // Nombre del archivo
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         window.onkeydown = (e) => {
