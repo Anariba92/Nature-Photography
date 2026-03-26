@@ -3,46 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Bosques | Árboles</title>
+    <title>Desarrollo | Álbum Bosques</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        .hidden-card { display: none !important; }
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
-        .preview-img { 
-            width: 100%; height: 100%; object-fit: cover; object-position: center; 
-            position: absolute; transition: opacity 0.5s ease; 
-            z-index: 0; opacity: 0; 
-        }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.5s ease; opacity: 0; }
         .preview-img.active { opacity: 1; z-index: 10; }
-        
-        .photo-card { perspective: 1000px; height: 460px; transition: transform 0.3s; }
+        .photo-card { perspective: 1000px; height: 460px; }
         .inner-card { transition: transform 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; }
-        .back-card { 
-            transform: rotateY(180deg); background: #064e3b; color: white; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
-        }
-        
+        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
+        .back-card { transform: rotateY(180deg); background: #064e3b; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; }
-        
-        /* CLASE CLAVE: Si no está esta clase, el filtro no funciona */
-        .hidden-card { display: none !important; }
     </style>
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
 
+    <script>
+        (function() {
+            const claveCorrecta = "1234"; // Define tu clave aquí
+            if (sessionStorage.getItem("dev_auth") !== "true") {
+                const pass = prompt("Contraseña de Desarrollador:");
+                if (pass === claveCorrecta) {
+                    sessionStorage.setItem("dev_auth", "true");
+                } else {
+                    document.body.innerHTML = "<div style='text-align:center;margin-top:100px;'><h1>Acceso Restringido</h1><p>Sitio en fase de desarrollo.</p></div>";
+                    window.stop();
+                }
+            }
+        })();
+    </script>
+
     <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
-            <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all">
-                ❮ MENÚ
-            </a>
-            
+            <span class="font-bold text-green-800">MODO DESARROLLO</span>
             <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="¿Qué buscas? (ej: Pino)" 
-                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
-                
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar..." class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none">
                 <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none">
                     <option value="all">Todos los años</option>
                 </select>
@@ -51,159 +50,48 @@
     </nav>
 
     <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
+        <div class="photo-card" data-name="pino liquidambar" data-year="2026">
             <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img active">
-                            <img src="img/hoja.jpg" class="preview-img">
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 bg-black/30 text-white p-2 rounded-full z-20">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Liquidámbar</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Bosques frescos y hojas estrelladas."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                        <p>Información en desarrollo...</p>
+                        <span class="text-xs mt-4">2026</span>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="img/montaña.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">San Juancito</div>
-                    </div>
-                    <div class="back-card">
-                        <p class="italic">"Panorámica desde Francisco Morazán."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card" data-name="pino ocote pinabete bosque" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
-                    </div>
-                    <div class="back-card">
-                        <p class="italic">"Honduras tiene 7 especies de pino."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </main>
 
-    <div id="imageModal" onclick="closeModal()">
-        <span class="absolute top-5 right-10 text-white text-4xl cursor-pointer">&times;</span>
-        <img id="fullImage" src="">
-        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-6 py-2 rounded-full font-bold">Descargar Foto</button>
-    </div>
-
     <script>
-        // --- 1. CONFIGURACIÓN AL CARGAR LA PÁGINA ---
-        window.addEventListener('DOMContentLoaded', () => {
+        // Lógica de filtrado corregida para GitHub
+        window.addEventListener('load', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
-            const selectAnio = document.getElementById('yearFilter');
-            const listaAnios = new Set();
-
-            console.log("Sistema iniciado. Tarjetas encontradas:", tarjetas.length);
-
-            tarjetas.forEach(t => {
-                const anio = t.getAttribute('data-year');
-                if(anio) listaAnios.add(anio);
-            });
-
-            // Llenar el select automáticamente
-            Array.from(listaAnios).sort().reverse().forEach(anio => {
+            const select = document.getElementById('yearFilter');
+            const anios = new Set();
+            tarjetas.forEach(t => { if(t.dataset.year) anios.add(t.dataset.year); });
+            Array.from(anios).sort().reverse().forEach(a => {
                 const opt = document.createElement('option');
-                opt.value = anio;
-                opt.textContent = anio;
-                selectAnio.appendChild(opt);
+                opt.value = a; opt.textContent = a; select.appendChild(opt);
             });
         });
 
-        // --- 2. FUNCIÓN DE FILTRADO (Buscador + Año) ---
         function filtrarContenido() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const anioFiltro = document.getElementById('yearFilter').value;
-            const tarjetas = document.querySelectorAll('.photo-card');
-
-            tarjetas.forEach(tarjeta => {
-                const nombre = (tarjeta.getAttribute('data-name') || "").toLowerCase();
-                const anio = tarjeta.getAttribute('data-year') || "";
-
-                const coincideTexto = nombre.includes(input);
-                const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
-
-                // Si cumple AMBAS condiciones, se muestra
-                if (coincideTexto && coincideAnio) {
-                    tarjeta.classList.remove('hidden-card');
-                } else {
-                    tarjeta.classList.add('hidden-card');
-                }
+            const txt = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(t => {
+                const coincideTxt = t.dataset.name.toLowerCase().includes(txt);
+                const coincideYear = (year === 'all' || t.dataset.year === year);
+                t.classList.toggle('hidden-card', !(coincideTxt && coincideYear));
             });
         }
 
-        // --- 3. FUNCIONES DE INTERACCIÓN ---
-        function handleFlip(card, e) {
-            if (e.target.closest('button')) return;
-            card.classList.toggle('flipped');
-        }
-
-        function changeSlide(btn, step, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            imgs[activeIdx].classList.remove('active');
-            imgs[(activeIdx + step) % imgs.length].classList.add('active');
-        }
-
-        function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const activeImg = container.querySelector('.preview-img.active');
-            document.getElementById('fullImage').src = activeImg.src;
-            document.getElementById('imageModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-
-        function askDonation(e) {
-            e.stopPropagation();
-            Swal.fire({
-                title: '¿Quieres descargar la foto?',
-                text: "Puedes apoyarnos con una donación o descargar gratis.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Donar y bajar',
-                cancelButtonText: 'Bajar gratis'
-            }).then(() => {
-                const link = document.createElement('a');
-                link.href = document.getElementById('fullImage').src;
-                link.download = 'foto-bosque.jpg';
-                link.click();
-            });
-        }
+        function handleFlip(card, e) { card.classList.toggle('flipped'); }
     </script>
 </body>
 </html>
