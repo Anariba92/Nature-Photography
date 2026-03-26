@@ -4,167 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Álbum Forestal | Árboles</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
-        .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.4s ease; z-index: 0; opacity: 0; }
+        .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.5s ease; z-index: 0; opacity: 0; }
         .preview-img.active { opacity: 1; z-index: 10; }
 
-        /* Ajuste para que se vean bien en móviles */
-        .photo-card { perspective: 1200px; width: 100%; height: 460px; margin-bottom: 2rem; }
+        .photo-card { perspective: 1500px; height: 460px; margin-bottom: 2rem; }
         .inner-card { 
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
-            transform-style: preserve-3d; 
-            position: relative; 
-            width: 100%; 
-            height: 100%; 
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            transform-style: preserve-3d; position: relative; width: 100%; height: 100%; 
         }
+        .flipped .inner-card { transform: rotateY(180deg); }
         
         .front-card, .back-card { 
-            backface-visibility: hidden; 
-            -webkit-backface-visibility: hidden; 
-            position: absolute; 
-            inset: 0; 
-            border-radius: 1rem; 
-            width: 100%;
-            height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden; 
+            position: absolute; inset: 0; border-radius: 1rem; 
+        }
+        .back-card { 
+            transform: rotateY(180deg); z-index: 20; background: #064e3b; color: white;
+            display: flex; align-items: center; justify-content: center; padding: 2.5rem; text-align: center;
         }
 
-        .flipped .inner-card { transform: rotateY(180deg); }
-        .back-card { transform: rotateY(180deg); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #fullImage { max-width: 90%; max-height: 70vh; object-fit: contain; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Modal con Modo Oscuro Natural */
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(6, 20, 14, 0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 70vh; object-fit: contain; border-radius: 0.5rem; }
-
-        .nav-arrow { background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 50%; cursor: pointer; border: none; z-index: 50; }
-        #downloadBtn { margin-top: 20px; background: #16a34a; color: white; padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; }
+        .nav-arrow { background: rgba(0,0,0,0.5); color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; border: none; z-index: 50; transition: all 0.3s; }
+        .nav-arrow:hover { background: #16a34a; transform: scale(1.1); }
+        
+        #downloadBtn { margin-top: 24px; background: #16a34a; color: white; padding: 14px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; box-shadow: 0 10px 20px rgba(22,163,74,0.3); }
+        .swal2-container { z-index: 10001 !important; }
     </style>
 </head>
-<body class="bg-stone-100 p-4 md:p-10 pt-24">
+<body class="bg-stone-100 p-4 md:p-10 pt-28">
 
-    <div class="fixed top-5 left-6 z-[100]">
-        <a href="index.html" class="bg-white border border-stone-200 px-5 py-2 rounded-full shadow-md font-bold text-green-800 hover:bg-green-700 hover:text-white transition-all inline-block">
-            ❮ Exploraciones
+    <div class="fixed top-6 left-6 z-[100]">
+        <a href="index.html" class="bg-white/90 backdrop-blur-md border border-stone-200 px-6 py-3 rounded-full shadow-xl font-bold text-green-900 hover:bg-green-700 hover:text-white transition-all flex items-center gap-2">
+            <span>❮</span> MENÚ PRINCIPAL
         </a>
     </div>
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
         <div class="photo-card">
             <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
+                    <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
-                            <img src="img/Pino.jpg" class="preview-img active" alt="Foto principal">
-                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-2 top-1/2 -translate-y-1/2">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-2 top-1/2 -translate-y-1/2">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">🔍</button>
+                            <img src="img/Pino.jpg" class="preview-img active">
+                            <img src="img/hoja.jpg" class="preview-img">
+                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2">❯</button>
+                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest">Liquidámbar</div>
                     </div>
-                    <div class="back-card bg-green-900 text-white">
-                        <p>Hojas estrelladas y colores otoñales increíbles. Crece en zonas frescas de Honduras.</p>
+                    <div class="back-card">
+                        <p class="text-lg italic font-serif">"Hojas estrelladas que bailan con el viento otoñal de las zonas altas."</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card">
-            <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img active" alt="Bosque">
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Nacional</div>
-                    </div>
-                    <div class="back-card bg-green-800 text-white">
-                        <p>El Pinus oocarpa, símbolo de nuestra identidad y pulmón de nuestras montañas.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+        </main>
 
     <div id="imageModal" onclick="this.style.display='none'">
-        <span class="absolute top-5 right-8 text-white text-4xl cursor-pointer">&times;</span>
+        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-green-500">&times;</span>
         <img id="fullImage" src="" onclick="event.stopPropagation()">
-        <button id="downloadBtn" onclick="askDonation(event)">📥 Descargar Fotografía</button>
+        <button id="downloadBtn" onclick="askDonation(event)">📥 Descargar en Alta Calidad</button>
     </div>
 
     <script>
-        // Girar tarjeta
         function handleFlip(el, e) {
-            if (!e.target.closest('button')) {
-                el.closest('.photo-card').classList.toggle('flipped');
-            }
+            if (!e.target.closest('button')) el.closest('.photo-card').classList.toggle('flipped');
         }
 
-        // Cambiar imágenes internas
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
-            if (imgs.length <= 1) return;
-
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[activeIdx].classList.remove('active');
             let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
             imgs[nextIdx].classList.add('active');
         }
 
-        // Abrir Modal
         function openModal(btn, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const activeImg = container.querySelector('.preview-img.active');
-            document.getElementById('fullImage').src = activeImg.src;
+            const modalImg = document.getElementById('fullImage');
+            
+            modalImg.src = activeImg.src;
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        // CUADRO DE DONACIÓN (SweetAlert2)
         function askDonation(e) {
             e.stopPropagation();
             const imgUrl = document.getElementById('fullImage').src;
-
-            // Verificamos si la librería SweetAlert2 cargó
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
-                    title: '¿Deseas apoyar al autor?',
-                    text: "Tu donación ayuda a seguir documentando la naturaleza. La descarga iniciará ahora.",
+                    title: '¿Apoyas mi trabajo?',
+                    text: "Las donaciones me permiten seguir explorando y documentando la flora local.",
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonColor: '#16a34a',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Sí, donar y descargar',
-                    cancelButtonText: 'Solo descargar gratis',
+                    confirmButtonText: 'Donar y Descargar',
+                    cancelButtonText: 'Descargar Gratis',
                     heightAuto: false
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open('TU_LINK_DE_PAYPAL', '_blank');
-                    }
-                    ejecutarDescarga(imgUrl);
+                    if (result.isConfirmed) window.open('TU_LINK_DE_PAYPAL', '_blank');
+                    descargar(imgUrl);
                 });
-            } else {
-                // Si la librería falla, descarga directamente para no bloquear al usuario
-                ejecutarDescarga(imgUrl);
-            }
+            } else { descargar(imgUrl); }
         }
 
-        function ejecutarDescarga(url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = url.split('/').pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function descargar(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "naturaleza-foto.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
+
+        // Script inteligente: oculta flechas si no hay varias fotos
+        document.querySelectorAll('.img-container').forEach(c => {
+            if (c.querySelectorAll('.preview-img').length <= 1) {
+                c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'none');
+            }
+        });
     </script>
 </body>
 </html>
