@@ -14,21 +14,7 @@
     </style>
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans selection:bg-green-100">
-      <script>
-        (function() {
-            const claveCorrecta = "1234"; // Define tu clave aquí
-            if (sessionStorage.getItem("dev_auth") !== "true") {
-                const pass = prompt("Contraseña de Desarrollador:");
-                if (pass === claveCorrecta) {
-                    sessionStorage.setItem("dev_auth", "true");
-                } else {
-                    document.body.innerHTML = "<div style='text-align:center;margin-top:100px;'><h1>Acceso Restringido</h1><p>Sitio en fase de desarrollo.</p></div>";
-                    window.stop();
-                }
-            }
-        })();
-    </script>
-
+      
     <header class="py-20 px-6 text-center bg-white border-b border-stone-200">
         <h1 class="text-4xl md:text-6xl font-serif font-bold text-green-900 mb-4 uppercase tracking-tighter fade-in">Naturaleza en Lente</h1>
         <p class="text-stone-500 italic text-lg max-w-2xl mx-auto fade-in" style="animation-delay: 0.2s;">Selecciona una categoría para explorar la biodiversidad local.</p>
