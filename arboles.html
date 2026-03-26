@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Forestal Pro - Corregido</title>
+    <title>Álbum Forestal Pro - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
@@ -24,9 +24,40 @@
         .nav-arrow:hover { background: #16a34a; scale: 1.1; }
         
         .hide-nav .nav-arrow, .hide-nav .dots-container { display: none !important; }
+
+        /* Botones Superiores */
+        .top-nav-btn {
+            background: white; color: #166534; padding: 10px 18px;
+            border-radius: 50px; font-weight: bold; display: flex; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s;
+        }
+        .top-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn-donate { background: #166534; color: white; }
+        .btn-donate:hover { background: #15803d; color: white; }
     </style>
 </head>
-<body class="bg-stone-100 p-6">
+<body class="bg-stone-100 p-6 pt-24">
+
+    <div class="fixed top-5 left-0 w-full px-6 flex justify-between items-center z-[100]">
+        <a href="index.html" class="top-nav-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Menú Principal
+        </a>
+
+        <a href="https://www.paypal.com" target="_blank" class="top-nav-btn btn-donate">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            Apoyar Proyecto
+        </a>
+    </div>
+
+    <header class="max-w-7xl mx-auto mb-10 text-center">
+        <h1 class="text-3xl font-serif font-bold text-green-900 uppercase tracking-widest">Patrimonio Natural de Honduras</h1>
+        <p class="text-stone-500 italic mt-2">Documentación fotográfica de nuestra flora</p>
+    </header>
 
     <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
@@ -49,7 +80,7 @@
                                 <div onclick="switchImgByDot(this, 2, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
                             </div>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Nombre común: Liquidámbar</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
                     </div>
                     <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center shadow-xl">
                         <p>El Liquidámbar destaca por sus hojas en forma de estrella y colores otoñales intensos.</p>
@@ -78,7 +109,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Pino en Honduras</div>
                     </div>
                     <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>El Pino (Pinus oocarpa) es el árbol nacional de Honduras, por su variedad y por que predomina en su territorio.</p>
+                        <p>El Pino (Pinus oocarpa) es el árbol nacional de Honduras, por su variedad y porque predomina en su territorio.</p>
                     </div>
                 </div>
             </div>
@@ -100,7 +131,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <div id="imageModal" onclick="this.style.display='none'">
@@ -116,7 +146,6 @@
         let modalIdx = 0;
 
         function handleFlip(el, e) {
-            // Solo gira si NO haces clic en un botón o en los puntos
             if (!e.target.closest('button') && !e.target.closest('.dots-container')) {
                 el.closest('.photo-card').classList.toggle('flipped');
             }
