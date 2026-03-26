@@ -3,15 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum: Bosques | Portafolio</title>
+    <title>Álbum: Bosques | Portafolio Híbrido</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Efectos visuales de las tarjetas */
         .photo-card:hover .img-container img { transform: scale(1.1); transition: 0.5s; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .img-container { overflow: hidden; position: relative; }
         .inner-card { transition: transform 0.6s; transform-style: preserve-3d; }
         
-        /* Estilos del Modal (Forzados para que funcione) */
+        /* Contenedor de la imagen (recorta el zoom) */
+        .img-container { 
+            overflow: hidden; 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            backface-visibility: hidden; 
+        }
+
+        /* Estilos base para las imágenes de la galería */
+        .gallery-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease-in-out;
+            transform: scale(1.25); /* Zoom por defecto en miniatura */
+        }
+
+        /* Estilos del Modal (Forzados para que funcione siempre) */
         #imageModal {
             display: none; /* Por defecto oculto */
             position: fixed;
@@ -21,12 +41,15 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            cursor: pointer;
         }
         #fullImage {
             max-width: 90%;
             max-height: 80%;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            /* Importante: En el modal NO queremos el zoom de la miniatura */
+            transform: scale(1) !important; 
         }
     </style>
 </head>
@@ -36,30 +59,44 @@
         <h1 class="text-4xl font-serif font-bold text-green-900">Colección: Bosques</h1>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
         
         <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
             <div class="relative h-80 cursor-pointer" onclick="if(!event.target.closest('.nav-btn')) this.classList.toggle('flipped')">
                 <div class="inner-card relative w-full h-full">
-                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                        <img src="img/Pino.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
-                        <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
+                    
+                    <div class="img-container">
+                        
+                        <div class="absolute inset-0 w-full h-full">
+                            <img src="img/Pino.jpg" alt="Liquidámbar 1" 
+                                 class="gallery-image opacity-100 z-10" data-index="0">
+                            <img src="img/bosque.jpg" alt="Liquidámbar 2" 
+                                 class="gallery-image opacity-0 z-0" data-index="1">
+                        </div>
+
+                        <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                         </button>
+
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                            <button onclick="event.stopPropagation(); changeImage(this, 0)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white"></button>
+                            <button onclick="event.stopPropagation(); changeImage(this, 1)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white/80"></button>
+                        </div>
                     </div>
-                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center">
-                        <p>Información del Liquidámbar...</p>
+
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>Información detallada del Liquidámbar...</p>
                     </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-800">Liquidámbar</div>
+            <div class="p-4 text-center font-bold text-green-800 border-t border-stone-100">Liquidámbar</div>
         </div>
 
         <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
             <div class="relative h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
                 <div class="inner-card relative w-full h-full">
-                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                        <img src="img/bosque.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
+                    <div class="img-container">
+                        <img src="img/bosque.jpg" alt="Pino Nacional" class="gallery-image opacity-100 z-10">
                         <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                         </button>
@@ -69,24 +106,24 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-800">Pino</div>
+            <div class="p-4 text-center font-bold text-green-800 border-t border-stone-100">Pino Nacional</div>
         </div>
 
         <div class="photo-card bg-white rounded-xl overflow-hidden shadow-md">
             <div class="relative h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
                 <div class="inner-card relative w-full h-full">
-                    <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
-                        <img src="img/montaña.jpg" class="active-img absolute inset-0 w-full h-full object-cover scale-125">
+                    <div class="img-container">
+                        <img src="img/montaña.jpg" alt="Montaña" class="gallery-image opacity-100 z-10">
                         <button onclick="event.stopPropagation(); showFull(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                         </button>
                     </div>
                     <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
-                        <p>Información de la Montaña.</p>
+                        <p>Vista panorámica desde San Juancito, en Francisco Morazán.</p>
                     </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-800">Montaña</div>
+            <div class="p-4 text-center font-bold text-green-800 border-t border-stone-100">Montaña</div>
         </div>
 
     </main>
@@ -94,25 +131,58 @@
     <div id="imageModal" onclick="this.style.display='none'">
         <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer">&times;</span>
         <img id="fullImage" src="">
-        <p class="text-white mt-4 italic">Haz clic en cualquier lugar para cerrar</p>
+        <p class="text-white mt-4 italic text-sm">Haz clic en cualquier lugar para cerrar</p>
     </div>
 
     <script>
-        function showFull(boton) {
-            // Buscamos la imagen que está dentro de la misma tarjeta que el botón
-            const card = boton.closest('.photo-card');
-            const imagenEnTarjeta = card.querySelector('.active-img');
-            
-            // Obtenemos el modal y la imagen del modal
-            const modal = document.getElementById('imageModal');
-            const fullImg = document.getElementById('fullImage');
-            
-            // Pasamos la ruta de la imagen
-            fullImg.src = imagenEnTarjeta.src;
-            
-            // Mostramos el modal usando estilo directo para evitar errores de Tailwind
-            modal.style.display = 'flex';
+        // --- 1. FUNCIÓN PARA EL CARRUSEL DE LA TARJETA ---
+        function changeImage(dotButton, index) {
+            const card = dotButton.closest('.photo-card');
+            const images = card.querySelectorAll('.gallery-image');
+            const dots = card.querySelectorAll('.gallery-dot');
+
+            // Ocultar todas las imágenes y resetear puntos
+            images.forEach((img, i) => {
+                img.classList.replace(i === index ? 'opacity-0' : 'opacity-100', i === index ? 'opacity-100' : 'opacity-0');
+                img.classList.replace(i === index ? 'z-0' : 'z-10', i === index ? 'z-10' : 'z-0');
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('bg-white', i === index);
+                dot.classList.toggle('bg-white/40', i !== index);
+            });
         }
+
+        // --- 2. FUNCIÓN PARA LA LUPA (INTELIGENTE) ---
+        function showFull(botonLupa) {
+            // Buscamos la tarjeta contenedora
+            const card = botonLupa.closest('.photo-card');
+            
+            // Buscamos la imagen que está visible en ese momento (opacity-100)
+            const imagenVisible = card.querySelector('.gallery-image.opacity-100');
+            
+            if (imagenVisible) {
+                // Obtenemos el modal y la imagen del modal
+                const modal = document.getElementById('imageModal');
+                const fullImg = document.getElementById('fullImage');
+                
+                // Pasamos la ruta de la imagen visible
+                fullImg.src = imagenVisible.src;
+                
+                // Mostramos el modal
+                modal.style.display = 'flex';
+                
+                // Bloquear scroll de fondo
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // --- 3. CERRAR MODAL (AL HACER CLIC FUERA) ---
+        document.getElementById('imageModal').addEventListener('click', function() {
+            this.style.display = 'none';
+            // Restaurar scroll de fondo
+            document.body.style.overflow = '';
+        });
     </script>
 </body>
 </html>
