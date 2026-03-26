@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Forestal Pro - Final</title>
+    <title>Álbum Forestal - Sistema de Donación</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -16,110 +16,61 @@
         .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
         .front-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
 
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; }
-        #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; }
+        /* Modal con z-index 9999 */
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; border: 2px solid rgba(255,255,255,0.1); }
 
-        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; padding: 12px; border-radius: 50%; cursor: pointer; z-index: 60; transition: 0.3s; border: none; }
-        .nav-arrow:hover { background: #16a34a; scale: 1.1; }
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; padding: 12px; border-radius: 50%; cursor: pointer; z-index: 60; border: none; }
         
-        .hide-nav .nav-arrow, .hide-nav .dots-container { display: none !important; }
-
-        .top-nav-btn { background: white; color: #166534; padding: 10px 18px; border-radius: 50px; font-weight: bold; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s; }
+        .top-nav-btn { background: white; color: #166534; padding: 10px 18px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
-        /* Estilo para el botón de descargar en el modal */
+        /* Botón de descarga */
         #downloadBtn {
-            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: #16a34a; color: white; padding: 10px 25px; border-radius: 50px;
-            font-weight: bold; cursor: pointer; z-index: 10000; transition: 0.3s;
+            margin-top: 20px; background: #16a34a; color: white; padding: 12px 30px; 
+            border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        #downloadBtn:hover { background: #15803d; transform: translateX(-50%) scale(1.05); }
+        #downloadBtn:hover { background: #15803d; scale: 1.05; }
+        
+        /* Forzar que el mensaje de SweetAlert esté por encima de TODO */
+        .swal2-container { z-index: 10001 !important; }
     </style>
 </head>
 <body class="bg-stone-100 p-6 pt-24">
 
-    <div class="fixed top-5 left-0 w-full px-6 flex justify-between items-center z-[100]">
+    <div class="fixed top-5 left-6 z-[100]">
         <a href="index.html" class="top-nav-btn">❮ Menú</a>
-        <h2 class="hidden md:block font-serif text-green-900 font-bold uppercase tracking-widest">Patrimonio Natural</h2>
     </div>
 
     <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-        <div class="photo-card" data-id="bosque">
+        <div class="photo-card">
             <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-xl">
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/hoja.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
-                            <img src="img/tronco.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
-                            <button onclick="moveImg(this, -1, event)" class="nav-arrow left-2">❮</button>
                             <button onclick="moveImg(this, 1, event)" class="nav-arrow right-2">❯</button>
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-                            <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
-                                <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
-                                <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
-                                <div onclick="switchImgByDot(this, 2, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
-                            </div>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-widest">Flora Nacional</div>
                     </div>
-                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>Hojas estrelladas y colores otoñales intensos.</p>
+                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center">
+                        <p>Haz clic en la lupa para descargar la fotografía en alta calidad.</p>
                     </div>
                 </div>
             </div>
         </div>
+        </main>
 
-        <div class="photo-card" data-id="pino">
-            <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-xl">
-                        <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
-                            <img src="img/bellota.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
-                            <button onclick="moveImg(this, -1, event)" class="nav-arrow left-2">❮</button>
-                            <button onclick="moveImg(this, 1, event)" class="nav-arrow right-2">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-                            <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
-                                <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
-                                <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
-                            </div>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino en Honduras</div>
-                    </div>
-                    <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>Árbol nacional, símbolo de vigor y predominio territorial.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card hide-nav" data-id="montaña">
-            <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-xl">
-                        <div class="img-container">
-                            <img src="img/montaña.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Montaña</div>
-                    </div>
-                    <div class="back-card bg-stone-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
-                        <p>Vista panorámica desde San Juancito, Fco. Morazán.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div id="imageModal" onclick="this.style.display='none'">
-        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer">&times;</span>
-        <button class="nav-arrow left-6 text-2xl" onclick="moveModal(-1, event)">❮</button>
-        <img id="fullImage" src="" onclick="event.stopPropagation()">
+    <div id="imageModal">
+        <span onclick="this.parentElement.style.display='none'" class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-green-400">&times;</span>
         
-        <button id="downloadBtn" onclick="askDonation(event)">Descargar esta Foto</button>
+        <img id="fullImage" src="">
         
-        <button class="nav-arrow right-6 text-2xl" onclick="moveModal(1, event)">❯</button>
-        <div id="counter" class="absolute bottom-8 text-white font-mono bg-black/40 px-4 py-1 rounded-full"></div>
+        <button id="downloadBtn" onclick="askDonation(event)">📥 Descargar Fotografía</button>
+        
+        <div id="counter" class="mt-4 text-white/70 font-mono text-sm"></div>
     </div>
 
     <script>
@@ -127,37 +78,7 @@
         let modalIdx = 0;
 
         function handleFlip(el, e) {
-            if (!e.target.closest('button') && !e.target.closest('.dots-container')) {
-                el.closest('.photo-card').classList.toggle('flipped');
-            }
-        }
-
-        function updateUI(card, index) {
-            const imgs = card.querySelectorAll('.preview-img');
-            const dots = card.querySelectorAll('.dots-container div');
-            imgs.forEach((img, i) => {
-                img.style.opacity = (i === index) ? "1" : "0";
-                img.style.zIndex = (i === index) ? "10" : "0";
-            });
-            dots.forEach((dot, i) => {
-                dot.style.backgroundColor = (i === index) ? "white" : "rgba(255,255,255,0.4)";
-            });
-        }
-
-        function moveImg(btn, step, e) {
-            e.stopPropagation();
-            const card = btn.closest('.photo-card');
-            const imgs = card.querySelectorAll('.preview-img');
-            let active = 0;
-            imgs.forEach((img, i) => { if (img.style.opacity === "1") active = i; });
-            let next = (active + step + imgs.length) % imgs.length;
-            updateUI(card, next);
-        }
-
-        function switchImgByDot(dot, index, e) {
-            e.stopPropagation();
-            const card = dot.closest('.photo-card');
-            updateUI(card, index);
+            if (!e.target.closest('button')) el.closest('.photo-card').classList.toggle('flipped');
         }
 
         function openModal(btn, e) {
@@ -165,44 +86,39 @@
             const card = btn.closest('.photo-card');
             const imgs = card.querySelectorAll('.preview-img');
             currentGallery = Array.from(imgs).map(img => img.src);
+            
+            // Buscar cuál imagen está visible
             imgs.forEach((img, i) => { if (img.style.opacity === "1") modalIdx = i; });
+            
             showModalImg();
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        function moveModal(step, e) {
-            e.stopPropagation();
-            modalIdx = (modalIdx + step + currentGallery.length) % currentGallery.length;
-            showModalImg();
-        }
-
         function showModalImg() {
             document.getElementById('fullImage').src = currentGallery[modalIdx];
-            document.getElementById('counter').innerText = `${modalIdx + 1} / ${currentGallery.length}`;
+            document.getElementById('counter').innerText = `IMAGEN ${modalIdx + 1} DE ${currentGallery.length}`;
         }
 
-        // --- LÓGICA DE DONACIÓN Y DESCARGA ---
+        // LÓGICA DE DONACIÓN (Ahora al frente)
         function askDonation(e) {
             e.stopPropagation();
             const imgUrl = document.getElementById('fullImage').src;
 
             Swal.fire({
-                title: '¿Te gustaría apoyar este proyecto?',
-                text: "Si valoras estas fotografías de nuestra flora, considera una donación voluntaria. La descarga iniciará de cualquier forma.",
-                icon: 'heart',
+                title: '¿Apoyarías este proyecto?',
+                html: "Si te gusta esta fotografía, tu donación voluntaria ayuda a seguir documentando la flora de <b>Honduras</b>.<br><small>(La descarga iniciará de cualquier forma)</small>",
+                icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#166534',
                 cancelButtonColor: '#78716c',
                 confirmButtonText: 'Sí, donar y descargar',
-                cancelButtonText: 'No, solo descargar'
+                cancelButtonText: 'Solo descargar gratis',
+                heightAuto: false // Evita que la página salte al aparecer el mensaje
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Abrir link de donación (ejemplo PayPal)
-                    window.open('https://www.paypal.com/donate?your-link-here', '_blank');
-                    // Iniciar descarga tras un segundo
-                    setTimeout(() => startDownload(imgUrl), 1000);
-                } else {
-                    // Solo descargar
+                    window.open('https://www.paypal.com/donate?link-real', '_blank');
+                    startDownload(imgUrl);
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
                     startDownload(imgUrl);
                 }
             });
@@ -211,19 +127,28 @@
         function startDownload(url) {
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'Fotografia_Honduras.jpg'; // Nombre del archivo
+            // Extraer nombre del archivo original
+            const fileName = url.split('/').pop();
+            link.setAttribute('download', fileName);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        window.onkeydown = (e) => {
-            if (document.getElementById('imageModal').style.display === 'flex') {
-                if (e.key === "ArrowLeft") moveModal(-1, e);
-                if (e.key === "ArrowRight") moveModal(1, e);
-                if (e.key === "Escape") document.getElementById('imageModal').style.display = 'none';
-            }
-        };
+        // Navegación interna de la galería si hay varias fotos
+        function moveImg(btn, step, e) {
+            e.stopPropagation();
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            let active = 0;
+            imgs.forEach((img, i) => { if (img.style.opacity === "1") active = i; });
+            let next = (active + step + imgs.length) % imgs.length;
+            
+            imgs.forEach((img, i) => {
+                img.style.opacity = (i === next) ? "1" : "0";
+                img.style.zIndex = (i === next) ? "10" : "0";
+            });
+        }
     </script>
 </body>
 </html>
