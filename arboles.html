@@ -3,121 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum: Bosques | Portafolio Completo</title>
+    <title>Álbum: Bosques | Portafolio Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .photo-card:hover .img-container img { transform: scale(1.1); transition: 0.5s; }
-        .flipped .inner-card { transform: rotateY(180deg); }
-        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
-        .img-container { overflow: hidden; position: relative; width: 100%; height: 100%; backface-visibility: hidden; }
-
-        .gallery-image {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; transition: opacity 0.5s ease-in-out; transform: scale(1.25);
+        /* La tarjeta tiene un tamaño fijo para que la imagen se vea "recortada" */
+        .img-container { 
+            height: 350px; 
+            overflow: hidden; 
+            position: relative; 
+            background: #e5e7eb;
         }
+        
+        /* Imagen en el cuadro: Se ve recortada y con zoom */
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Esto hace que no se vea completa, sino que llene el espacio */
+            position: absolute;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Efecto Flip */
+        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 350px; }
+        .flipped .inner-card { transform: rotateY(180deg); }
+        .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; }
+        .front-card { backface-visibility: hidden; position: absolute; inset: 0; }
 
         /* Modal / Lightbox */
         #imageModal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.95); z-index: 9999;
-            justify-content: center; align-items: center;
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 9999; 
+            align-items: center; 
+            justify-content: center;
         }
-        #fullImage { max-width: 85%; max-height: 80%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        /* Imagen en modo completo: Se ve TODA la imagen sin recortes */
+        #fullImage { 
+            max-width: 95%; 
+            max-height: 90vh; 
+            object-fit: contain; 
+        }
 
         .modal-nav {
             position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(255,255,255,0.1); color: white; border: none;
-            padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px;
-            transition: 0.3s; z-index: 10001;
+            background: rgba(255,255,255,0.1); color: white; padding: 20px;
+            border-radius: 50%; font-size: 30px; cursor: pointer; z-index: 10000;
         }
-        .modal-nav:hover { background: rgba(22, 163, 74, 0.8); }
     </style>
 </head>
-<body class="bg-stone-100 text-stone-800">
+<body class="bg-stone-100 p-8">
 
-    <nav class="p-6 max-w-6xl mx-auto">
-        <a href="index.html" class="text-green-800 font-bold hover:underline">← Volver al Inicio</a>
-    </nav>
-
-    <header class="py-10 text-center">
-        <h1 class="text-4xl font-serif font-bold text-green-900 uppercase tracking-widest">Colección: Bosques</h1>
-        <div class="h-1 w-20 bg-green-600 mx-auto mt-2"></div>
-    </header>
-
-    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
+    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="relative h-96 cursor-pointer" onclick="if(!event.target.closest('.nav-btn')) this.classList.toggle('flipped')">
+        <div class="photo-card bg-white rounded-xl shadow-xl overflow-hidden" id="card-1">
+            <div class="relative cursor-pointer" onclick="if(!event.target.closest('.no-flip')) this.closest('.photo-card').classList.toggle('flipped')">
                 <div class="inner-card">
-                    <div class="img-container">
-                        <img src="img/Pino.jpg" class="gallery-image opacity-100 z-10">
-                        <img src="img/bosque.jpg" class="gallery-image opacity-0 z-0">
-                        
-                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                        </button>
+                    <div class="front-card">
+                        <div class="img-container">
+                            <img src="img/Pino.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
+                            <img src="img/bosque.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
+                            
+                            <button onclick="event.stopPropagation(); openGallery(1)" class="no-flip absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50">
+                                🔍
+                            </button>
 
-                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/20 px-3 py-1 rounded-full">
-                            <button onclick="event.stopPropagation(); changeCardImg(this, 0)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white"></button>
-                            <button onclick="event.stopPropagation(); changeCardImg(this, 1)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white/40"></button>
+                            <div class="no-flip absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
+                                <div onclick="event.stopPropagation(); switchImg(1, 0)" class="w-3 h-3 rounded-full bg-white cursor-pointer"></div>
+                                <div onclick="event.stopPropagation(); switchImg(1, 1)" class="w-3 h-3 rounded-full bg-white/40 cursor-pointer"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
-                        <p>El Liquidámbar es conocido por su resina aromática y sus colores otoñales.</p>
+                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center">
+                        <p>Información del Liquidámbar.</p>
                     </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-900 bg-white">Liquidámbar</div>
+            <div class="p-4 text-center font-bold text-green-800">Liquidámbar</div>
         </div>
 
-        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="relative h-96 cursor-pointer" onclick="this.classList.toggle('flipped')">
+        <div class="photo-card bg-white rounded-xl shadow-xl overflow-hidden" id="card-2">
+            <div class="relative cursor-pointer" onclick="this.closest('.photo-card').classList.toggle('flipped')">
                 <div class="inner-card">
-                    <div class="img-container">
-                        <img src="img/bosque.jpg" class="gallery-image opacity-100 z-10">
-                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                        </button>
+                    <div class="front-card">
+                        <div class="img-container">
+                            <img src="img/bosque.jpg" class="preview-img" style="opacity: 1;">
+                            <button onclick="event.stopPropagation(); openGallery(2)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50">🔍</button>
+                        </div>
                     </div>
-                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
-                        <p>El Pino es el árbol nacional de Honduras, símbolo de fuerza y naturaleza.</p>
-                    </div>
+                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center">Pino Nacional</div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-900 bg-white">Pino Nacional</div>
+            <div class="p-4 text-center font-bold text-green-800">Pino</div>
         </div>
 
-        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="relative h-96 cursor-pointer" onclick="this.classList.toggle('flipped')">
+        <div class="photo-card bg-white rounded-xl shadow-xl overflow-hidden" id="card-3">
+            <div class="relative cursor-pointer" onclick="this.closest('.photo-card').classList.toggle('flipped')">
                 <div class="inner-card">
-                    <div class="img-container">
-                        <img src="img/montaña.jpg" class="gallery-image opacity-100 z-10">
-                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                        </button>
+                    <div class="front-card">
+                        <div class="img-container">
+                            <img src="img/montaña.jpg" class="preview-img" style="opacity: 1;">
+                            <button onclick="event.stopPropagation(); openGallery(3)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50">🔍</button>
+                        </div>
                     </div>
-                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
-                        <p>Las montañas de Honduras albergan una biodiversidad única en la región.</p>
-                    </div>
+                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center">Montañas de Honduras</div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-900 bg-white">Montaña</div>
+            <div class="p-4 text-center font-bold text-green-800">Montaña</div>
         </div>
 
     </main>
 
-    <div id="imageModal" onclick="closeModalByClick(event)">
-        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer z-[10002]" onclick="closeModalForce()">&times;</span>
-        <button id="prevBtn" class="modal-nav" onclick="changeLightboxImg(-1, event)">&#10094;</button>
-        <img id="fullImage" src="" onclick="event.stopPropagation()">
-        <button id="nextBtn" class="modal-nav" onclick="changeLightboxImg(1, event)">&#10095;</button>
+    <div id="imageModal">
+        <span onclick="closeModal()" class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-500">&times;</span>
+        
+        <button id="mPrev" class="modal-nav left-5" onclick="moveModal(-1)">&#10094;</button>
+        <img id="fullImage" src="">
+        <button id="mNext" class="modal-nav right-5" onclick="moveModal(1)">&#10095;</button>
     </div>
 
     <script>
-        let currentGallery = [];
-        let currentIndex = 0;
+        let modalImages = [];
+        let modalIdx = 0;
 
-        function changeCardImg(dot, idx) {
-            const card = dot.closest('.photo-card');
-            const imgs = card.querySelectorAll('.gallery-image');
-            const dots = card
+        // 1. CAMBIAR IMAGEN EN LA VISTA PREVIA (CUADRO)
+        function switchImg(cardNum, imgIdx) {
+            const card = document.getElementById('card-' + cardNum);
+            const imgs = card.querySelectorAll('.preview-img');
+            const dots = card.querySelectorAll('.no-flip div');
+
+            imgs.forEach((img, i) => {
+                img.style.opacity = (i === imgIdx) ? "1" : "0";
+                img.style.zIndex = (i === imgIdx) ? "10" : "0";
+            });
+
+            dots.forEach((dot, i) => {
+                dot.style.backgroundColor = (i === imgIdx) ? "white" : "rgba(255,255,255,0.4)";
+            });
+        }
+
+        // 2. ABRIR MODO COMPLETO (LUPA)
+        function openGallery(cardNum) {
+            const card = document.getElementById('card-' + cardNum);
+            const imgs = card.querySelectorAll('.preview-img');
+            
+            // Recoger las rutas
+            modalImages = Array.from(imgs).map(i => i.src);
+            
+            // Ver cuál está visible ahora
+            modalIdx = 0;
+            imgs.forEach((img, i) => {
+                if(img.style.opacity === "1") modalIdx = i;
+            });
+
+            // Configurar botones
+            document.getElementById('mPrev').style.display = (modalImages.length > 1) ? 'block' : 'none';
+            document.getElementById('mNext').style.display = (modalImages.length > 1) ? 'block' : 'none';
+
+            showModalImg();
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        // 3. NAVEGAR EN EL MODAL
+        function moveModal(step) {
+            modalIdx += step;
+            if(modalIdx < 0) modalIdx = modalImages.length - 1;
+            if(modalIdx >= modalImages.length) modalIdx = 0;
+            showModalImg();
+        }
+
+        function showModalImg() {
+            document.getElementById('fullImage').src = modalImages[modalIdx];
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Teclado
+        window.onkeydown = function(e) {
+            if(document.getElementById('imageModal').style.display === 'flex') {
+                if(e.key === "Escape") closeModal();
+                if(e.key === "ArrowLeft") moveModal(-1);
+                if(e.key === "ArrowRight") moveModal(1);
+            }
+        }
+    </script>
+</body>
+</html>
