@@ -11,13 +11,35 @@
         .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.4s ease; z-index: 0; opacity: 0; }
         .preview-img.active { opacity: 1; z-index: 10; }
 
-        .photo-card { perspective: 1000px; }
-        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 380px; }
-        .flipped .inner-card { transform: rotateY(180deg); }
-        .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
-        .front-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
+        /* --- CORRECCIÓN CRÍTICA PARA MÓVILES --- */
+        .photo-card { perspective: 1200px; }
+        .inner-card { 
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
+            transform-style: preserve-3d; 
+            position: relative; 
+            width: 100%; 
+            height: 380px; 
+        }
+        
+        /* Evita que la imagen frontal se vea en el móvil al girar */
+        .front-card, .back-card { 
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden; 
+            position: absolute; 
+            inset: 0; 
+            border-radius: 1rem; 
+            width: 100%;
+            height: 100%;
+        }
 
-        /* MODO OSCURO NATURAL (VERDE PROFUNDO) */
+        .flipped .inner-card { transform: rotateY(180deg); }
+
+        .back-card { 
+            transform: rotateY(180deg); 
+            z-index: 20; /* Asegura que el texto esté al frente al girar */
+        }
+        /* --------------------------------------- */
+
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(6, 20, 14, 0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
 
@@ -31,160 +53,4 @@
 <body class="bg-stone-100 p-6 pt-24">
 
     <div class="fixed top-5 left-6 z-[100]">
-        <a href="index.html" class="group flex items-center bg-white/90 backdrop-blur-sm border border-stone-200 px-5 py-2.5 rounded-full shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300">
-            <span class="mr-2 transform group-hover:-translate-x-1 transition-transform">❮</span>
-            <span class="font-bold text-sm uppercase tracking-wider">Exploraciones</span>
-        </a>
-    </div>
-
-    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-        
-        <div class="photo-card">
-            <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-xl">
-                        <div class="img-container">
-                            <img src="img/Pino.jpg" alt="Vista del Pino Nacional de Honduras" class="preview-img active" loading="lazy">
-                            <img src="img/hoja.jpg" alt="Detalle de las hojas aciculares" class="preview-img" loading="lazy">
-                            <img src="img/tronco.jpg" alt="Textura de la corteza del árbol" class="preview-img" loading="lazy">
-                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2 text-xs">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2 text-xs">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 shadow-lg">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-widest">Liquidámbar</div>
-                    </div>
-                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center">
-                        <div>
-                            <h4 class="font-bold mb-2">Curiosidades</h4>
-                            <p class="text-sm">Hojas estrelladas y colores otoñales que varían de amarillo a rojo intenso.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card">
-            <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-xl">
-                        <div class="img-container">
-                            <img src="img/bosque.jpg" alt="Panorámica del bosque de pinos" class="preview-img active" loading="lazy">
-                            <img src="img/bellota.jpg" alt="Fruto del árbol" class="preview-img" loading="lazy">
-                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2 text-xs">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2 text-xs">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 shadow-lg">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-widest">Pino sp.</div>
-                    </div>
-                    <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center text-center">
-                        <div>
-                            <h4 class="font-bold mb-2">El Símbolo Patrio</h4>
-                            <p class="text-sm">El Pinus oocarpa es el Árbol Nacional de Honduras, por su distribución en todo el territorio nacional.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card">
-            <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-xl">
-                        <div class="img-container">
-                            <img src="img/montaña.jpg" alt="Montañas de la cordillera hondureña" class="preview-img active" loading="lazy">
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 shadow-lg">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-widest">Montaña</div>
-                    </div>
-                    <div class="back-card bg-stone-800 text-white p-8 flex items-center justify-center text-center">
-                        <p>Vista desde San Juancito, pulmón verde de Francisco Morazán.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <div id="imageModal" onclick="this.style.display='none'">
-        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-green-500">&times;</span>
-        <button class="nav-arrow left-6 text-2xl" onclick="moveModal(-1, event)">❮</button>
-        <img id="fullImage" src="" alt="Vista a pantalla completa" onclick="event.stopPropagation()">
-        <button id="downloadBtn" onclick="askDonation(event)">📥 Descargar Fotografía</button>
-        <button class="nav-arrow right-6 text-2xl" onclick="moveModal(1, event)">❯</button>
-        <div id="counter" class="mt-4 text-stone-400 font-mono text-xs bg-white/5 px-4 py-1 rounded-full"></div>
-    </div>
-
-    <script>
-        let currentGallery = [];
-        let modalIdx = 0;
-
-        function handleFlip(el, e) {
-            if (!e.target.closest('button')) el.closest('.photo-card').classList.toggle('flipped');
-        }
-
-        function changeSlide(btn, step, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            imgs[activeIdx].classList.remove('active');
-            let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
-            imgs[nextIdx].classList.add('active');
-        }
-
-        function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            currentGallery = Array.from(imgs).map(img => img.src);
-            modalIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            const arrows = document.querySelectorAll('#imageModal .nav-arrow');
-            arrows.forEach(a => a.style.display = currentGallery.length > 1 ? 'block' : 'none');
-            showModalImg();
-            document.getElementById('imageModal').style.display = 'flex';
-        }
-
-        function moveModal(step, e) {
-            e.stopPropagation();
-            modalIdx = (modalIdx + step + currentGallery.length) % currentGallery.length;
-            showModalImg();
-        }
-
-        function showModalImg() {
-            document.getElementById('fullImage').src = currentGallery[modalIdx];
-            document.getElementById('counter').innerText = `IMAGEN ${modalIdx + 1} DE ${currentGallery.length}`;
-        }
-
-        function askDonation(e) {
-            e.stopPropagation();
-            const imgUrl = document.getElementById('fullImage').src;
-            Swal.fire({
-                title: '¿Te gustaría apoyar?',
-                text: "Si valoras este trabajo, puedes hacer una donación voluntaria. La descarga comenzará ahora.",
-                icon: 'heart',
-                showCancelButton: true,
-                confirmButtonColor: '#166534',
-                confirmButtonText: 'Sí, donar y descargar',
-                cancelButtonText: 'Solo descargar gratis',
-                heightAuto: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.open('URL_DE_DONACION', '_blank');
-                    startDownload(imgUrl);
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    startDownload(imgUrl);
-                }
-            });
-        }
-
-        function startDownload(url) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = url.split('/').pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
-</body>
-</html>
+        <a href="index.html" class="group flex items-center bg-white/90 backdrop-blur
