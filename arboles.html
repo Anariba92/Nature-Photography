@@ -3,61 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum: Bosques | Versión Pro con Flechas</title>
+    <title>Álbum: Bosques | Versión Final Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; }
+        /* Contenedor de imagen con altura fija para efecto "recorte" */
+        .img-container { 
+            height: 380px; 
+            overflow: hidden; 
+            position: relative; 
+            background: #1a1a1a; 
+        }
         
-        /* Imagen en el cuadro: Recortada para invitar a hacer click */
+        /* Imagen en el cuadro: Se ve recortada (cover) */
         .preview-img {
             width: 100%; height: 100%; object-fit: cover;
             position: absolute; transition: opacity 0.4s ease;
         }
 
-        /* Efecto Flip */
+        /* Efecto Flip de la tarjeta */
         .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 380px; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; }
-        .front-card { backface-visibility: hidden; position: absolute; inset: 0; }
+        .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
+        .front-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
 
-        /* Modal / Lightbox */
+        /* Modal / Lightbox (Pantalla Completa) */
         #imageModal {
             display: none; position: fixed; inset: 0; 
             background: rgba(0,0,0,0.98); z-index: 9999; 
             align-items: center; justify-content: center;
         }
-        #fullImage { max-width: 90%; max-height: 85vh; object-fit: contain; transition: 0.3s; }
+        /* Imagen en modo completo: Se ve TODA la imagen (contain) */
+        #fullImage { 
+            max-width: 90%; max-height: 85vh; 
+            object-fit: contain; border-radius: 4px;
+        }
 
         /* Botones de Navegación */
         .nav-arrow {
             position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.4); color: white; padding: 12px;
+            background: rgba(0,0,0,0.5); color: white; padding: 12px 16px;
             border-radius: 50%; cursor: pointer; z-index: 60; transition: 0.3s;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .nav-arrow:hover { background: #16a34a; scale: 1.1; }
+        .nav-arrow:hover { background: #16a34a; transform: translateY(-50%) scale(1.1); }
         
-        /* Ocultar flechas si solo hay una imagen */
-        .only-one .nav-arrow, .only-one .dots-container { display: none; }
+        /* Ocultar elementos de navegación si solo hay una imagen */
+        .only-one .nav-arrow, .only-one .dots-container { display: none !important; }
     </style>
 </head>
-<body class="bg-stone-100 p-4 md:p-10">
+<body class="bg-stone-100 p-4 md:p-10 font-sans">
+
+    <header class="text-center mb-12">
+        <h1 class="text-4xl font-serif font-bold text-green-900 uppercase tracking-tighter">Exploración Forestal</h1>
+        <p class="text-stone-600 mt-2">Haz clic en la lupa para ver a detalle o en la tarjeta para leer info.</p>
+    </header>
 
     <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
-        <div class="photo-card bg-white rounded-2xl shadow-2xl overflow-hidden" id="card-1">
+        <div class="photo-card bg-white rounded-2xl shadow-2xl" id="card-1">
             <div class="relative cursor-pointer" onclick="if(!event.target.closest('.no-flip')) this.closest('.photo-card').classList.toggle('flipped')">
                 <div class="inner-card">
-                    <div class="front-card">
+                    <div class="front-card overflow-hidden">
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/hoja.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
                             <img src="img/tronco.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
                             
-                            <button onclick="event.stopPropagation(); moveCardImg(1, -1)" class="no-flip nav-arrow left-2 text-sm">❮</button>
-                            <button onclick="event.stopPropagation(); moveCardImg(1, 1)" class="no-flip nav-arrow right-2 text-sm">❯</button>
-
-                            <button onclick="event.stopPropagation(); openGallery(1)" class="no-flip absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
-
-                            <div class="no-flip dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/40 p-2 rounded-full">
-                                <div onclick="event.
+                            <button onclick="event.stopPropagation(); moveCardImg(1, -1)" class="no-flip nav-arrow left-2">❮</button>
+                            <button onclick="event.stopPropagation(); moveCardImg(1, 1)" class="no-flip
