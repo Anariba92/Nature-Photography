@@ -9,6 +9,7 @@
     <style>
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         
+        /* Efecto de corte/zoom para la vista previa */
         .preview-img { 
             width: 100%; 
             height: 100%; 
@@ -26,23 +27,9 @@
         .inner-card { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
         .front-card, .back-card { backface-visibility: hidden; -webkit-backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
+        .back-card { transform: rotateY(180deg); z-index: 20; background: #064e3b; color: white; display: flex; align-items: center; justify-content: center; padding: 2.5rem; text-align: center; }
         
-        /* ESTA CLASE ES VITAL PARA QUE EL FILTRO FUNCIONE */
-        .hidden-card { display: none !important; }
-
-        .back-card { 
-            transform: rotateY(180deg); 
-            z-index: 20; 
-            background: #064e3b; 
-            color: white; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 2rem; 
-            text-align: center; 
-        }
-        
+        /* Modal */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 85%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; transform: scale(1); }
         
@@ -50,9 +37,13 @@
         .nav-arrow:hover { background: #16a34a; border-color: transparent; transform: scale(1.1); }
         
         #downloadBtn { margin-top: 24px; background: #16a34a; color: white; padding: 14px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; z-index: 100; }
+        .swal2-container { z-index: 10001 !important; }
+
+        /* Estilo para ocultar cartas */
+        .hidden-card { display: none; }
     </style>
 </head>
-<body class="bg-stone-100 p-4 md:p-10 pt-48 md:pt-32">
+<body class="bg-stone-100 p-4 md:p-10 pt-32">
 
     <div class="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-stone-200 z-[100] p-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -60,22 +51,14 @@
                 <span>❮</span> MENÚ PRINCIPAL
             </a>
             
-            <div class="flex flex-wrap gap-2 w-full md:w-auto justify-center">
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
                 <input type="text" id="searchInput" onkeyup="filtrarContenido()" placeholder="Buscar fotografía..." 
-                    class="flex-1 md:w-48 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
+                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
                 
-                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 outline-none bg-white text-sm">
-                    <option value="all">Año: Todos</option>
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 outline-none bg-white">
+                    <option value="all">Todos los años</option>
                     <option value="2026">2026</option>
-                    <option value="2025">2025</option>
-                </select>
-
-                <select id="monthFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 outline-none bg-white text-sm">
-                    <option value="all">Mes: Todos</option>
-                    <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
-                    <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
-                    <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
-                    <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                    
                 </select>
             </div>
         </div>
@@ -83,7 +66,7 @@
 
     <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
-        <div class="photo-card" data-name="liquidambar" data-year="2026" data-month="3">
+        <div class="photo-card" data-name="liquidambar" data-year="2026">
             <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-2xl">
@@ -91,63 +74,65 @@
                             <img src="img/Pino.jpg" class="preview-img active">
                             <img src="img/hoja.jpg" class="preview-img">
                             <img src="img/tronco.jpg" class="preview-img">
+                            
                             <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2 scale-75">❮</button>
                             <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2 scale-75">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                            
+                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
                             </button>
                         </div>
-                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest text-sm">Nombre común: Liquidámbar</div>
+                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest">Nombre común: Liquidámbar</div>
                     </div>
                     <div class="back-card">
-                        <div class="flex-1 flex items-center justify-center">
-                            <p class="text-lg italic font-serif">"El árbol de liquidámbar se caracteriza por bosques de climas frescos y su peculiar hoja estrellada."</p>
-                        </div>
-                        <span class="text-[10px] uppercase tracking-[0.2em] opacity-60 border-t border-white/20 pt-4 w-full">Capturado en: Marzo, 2026</span>
+                        <p class="text-lg italic font-serif">"El árbol de liquidámbar se caracteriza por bosques de climas frescos y su peculiar hoja estrellada."</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="san juancito sitio" data-year="2026" data-month="1">
+        <div class="photo-card" data-name="san juancito sitio" data-year="2026">
             <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
                             <img src="img/montaña.jpg" class="preview-img active">
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
                             </button>
                         </div>
-                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest text-sm">Sitio: “San Juancito”</div>
+                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest">Sitio: “San Juancito”</div>
                     </div>
                     <div class="back-card">
-                        <div class="flex-1 flex items-center justify-center">
-                            <p class="text-lg italic font-serif">"Panorámica desde el sitio San Juancito, en Francisco Morazán."</p>
-                        </div>
-                        <span class="text-[10px] uppercase tracking-[0.2em] opacity-60 border-t border-white/20 pt-4 w-full">Capturado en: Enero, 2026</span>
+                        <p class="text-lg italic font-serif">"Panorámica desde el sitio San Juancito, en Francisco Morazán."</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="pino ocote pinabete" data-year="2026" data-month="5">
+        <div class="photo-card" data-name="pino ocote pinabete" data-year="2026">
             <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
                             <img src="img/bosque.jpg" class="preview-img active">
+                            <img src="img/bellota.jpg" class="preview-img">
+                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2 scale-75">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2 scale-75">❯</button>
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
                             </button>
                         </div>
-                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest text-sm">Pino ocote y pinabete</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-tighter text-xs">Nombre común: Pino ocote, pinabete y otros</div>
                     </div>
                     <div class="back-card">
-                        <div class="flex-1 flex items-center justify-center">
-                            <p class="text-lg italic font-serif">"Honduras cuenta con una gran diversidad de coníferas distribuidas en todo su territorio."</p>
-                        </div>
-                        <span class="text-[10px] uppercase tracking-[0.2em] opacity-60 border-t border-white/20 pt-4 w-full">Capturado en: Mayo, 2026</span>
+                        <p class="text-sm italic font-serif">"Honduras cuenta con un total de 7 especies diferentes de pino."</p>
                     </div>
                 </div>
             </div>
@@ -163,23 +148,20 @@
     </div>
 
     <script>
-        // Función de filtrado corregida
+        // --- NUEVA LÓGICA DE FILTRADO ---
         function filtrarContenido() {
             const buscador = document.getElementById('searchInput').value.toLowerCase();
-            const anioSel = document.getElementById('yearFilter').value;
-            const mesSel = document.getElementById('monthFilter').value;
+            const anioSeleccionado = document.getElementById('yearFilter').value;
             const tarjetas = document.querySelectorAll('.photo-card');
 
             tarjetas.forEach(tarjeta => {
                 const nombre = tarjeta.getAttribute('data-name').toLowerCase();
                 const anio = tarjeta.getAttribute('data-year');
-                const mes = tarjeta.getAttribute('data-month');
                 
                 const coincideTexto = nombre.includes(buscador);
-                const coincideAnio = (anioSel === 'all' || anio === anioSel);
-                const coincideMes = (mesSel === 'all' || mes === mesSel);
+                const coincideAnio = (anioSeleccionado === 'all' || anio === anioSeleccionado);
 
-                if (coincideTexto && coincideAnio && coincideMes) {
+                if (coincideTexto && coincideAnio) {
                     tarjeta.classList.remove('hidden-card');
                 } else {
                     tarjeta.classList.add('hidden-card');
@@ -187,6 +169,7 @@
             });
         }
 
+        // --- TUS FUNCIONES ORIGINALES ---
         let currentAlbumContainer = null;
 
         function handleFlip(el, e) { 
@@ -209,27 +192,62 @@
             e.stopPropagation();
             currentAlbumContainer = btn.closest('.img-container');
             const activeImg = currentAlbumContainer.querySelector('.preview-img.active');
+            const allImgs = currentAlbumContainer.querySelectorAll('.preview-img');
+            document.getElementById('modalPrev').style.display = allImgs.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalNext').style.display = allImgs.length > 1 ? 'flex' : 'none';
             document.getElementById('fullImage').src = activeImg.src;
             document.getElementById('imageModal').style.display = 'flex';
         }
 
         function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
 
+        function modalNav(step, e) {
+            e.stopPropagation();
+            if (!currentAlbumContainer) return;
+            const imgs = currentAlbumContainer.querySelectorAll('.preview-img');
+            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[activeIdx].classList.remove('active');
+            let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
+            imgs[nextIdx].classList.add('active');
+            document.getElementById('fullImage').src = imgs[nextIdx].src;
+        }
+
         function askDonation(e) {
             e.stopPropagation();
             const imgUrl = document.getElementById('fullImage').src;
             Swal.fire({
-                title: '¿Deseas descargar?',
-                text: "Puedes realizar una donación voluntaria.",
+                title: '¿Te gustó esta captura?',
+                text: "Donación voluntaria para seguir capturando la naturaleza.",
                 icon: 'info',
                 showCancelButton: true,
+                confirmButtonColor: '#16a34a',
                 confirmButtonText: 'Donar y Descargar',
-                cancelButtonText: 'Descargar Gratis'
+                cancelButtonText: 'Descargar Gratis',
+                heightAuto: false
             }).then((result) => {
+                if (result.isConfirmed) window.open('TU_LINK_DE_PAYPAL', '_blank');
                 const a = document.createElement('a');
-                a.href = imgUrl; a.download = "bosque.jpg";
+                a.href = imgUrl; a.download = "foto_naturaleza.jpg";
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
             });
+        }
+
+        function checkArrows() {
+            document.querySelectorAll('.img-container').forEach(c => {
+                const imgs = c.querySelectorAll('.preview-img').length;
+                if (imgs <= 1) {
+                    c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'none');
+                } else {
+                    c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'flex');
+                }
+            });
+        }
+
+        window.onload = checkArrows;
+    </script>
+</body>
+</html>
+
         }
     </script>
 </body>
