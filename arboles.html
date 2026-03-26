@@ -22,21 +22,6 @@
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
 
-    <script>
-        (function() {
-            const claveCorrecta = "1234"; // Define tu clave aquí
-            if (sessionStorage.getItem("dev_auth") !== "true") {
-                const pass = prompt("Contraseña de Desarrollador:");
-                if (pass === claveCorrecta) {
-                    sessionStorage.setItem("dev_auth", "true");
-                } else {
-                    document.body.innerHTML = "<div style='text-align:center;margin-top:100px;'><h1>Acceso Restringido</h1><p>Sitio en fase de desarrollo.</p></div>";
-                    window.stop();
-                }
-            }
-        })();
-    </script>
-
     <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
             <span class="font-bold text-green-800">MODO DESARROLLO</span>
