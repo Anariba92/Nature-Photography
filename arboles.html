@@ -1,15 +1,123 @@
-<div id="imageModal" class="fixed inset-0 bg-black/95 z-[9999] hidden items-center justify-center" onclick="closeModalDirect(event)">
-    <button onclick="closeModalForce()" class="absolute top-5 right-10 text-white text-6xl hover:text-green-500 z-[10000]">&times;</button>
-    
-    <button id="prevBtn" onclick="changeLightboxImg(-1, event)" class="absolute left-5 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-green-600 text-white p-5 rounded-full z-[10000] text-3xl transition-all">
-        &#10094;
-    </button>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Álbum: Bosques | Portafolio Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .photo-card:hover .img-container img { transform: scale(1.1); transition: 0.5s; }
+        .flipped .inner-card { transform: rotateY(180deg); }
+        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
+        .img-container { overflow: hidden; position: relative; width: 100%; height: 100%; backface-visibility: hidden; }
 
-    <img id="fullImage" src="" class="max-w-[85%] max-h-[80%] rounded-lg shadow-2xl transition-transform duration-300" onclick="event.stopPropagation()">
+        .gallery-image {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; transition: opacity 0.5s ease-in-out; transform: scale(1.25);
+        }
 
-    <button id="nextBtn" onclick="changeLightboxImg(1, event)" class="absolute right-5 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-green-600 text-white p-5 rounded-full z-[10000] text-3xl transition-all">
-        &#10095;
-    </button>
-    
-    <p class="absolute bottom-10 text-white/40 text-sm">Usa las flechas o ESC para salir</p>
-</div>
+        /* Modal / Lightbox */
+        #imageModal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.95); z-index: 9999;
+            justify-content: center; align-items: center;
+        }
+        #fullImage { max-width: 85%; max-height: 80%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
+        .modal-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.1); color: white; border: none;
+            padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px;
+            transition: 0.3s; z-index: 10001;
+        }
+        .modal-nav:hover { background: rgba(22, 163, 74, 0.8); }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <nav class="p-6 max-w-6xl mx-auto">
+        <a href="index.html" class="text-green-800 font-bold hover:underline">← Volver al Inicio</a>
+    </nav>
+
+    <header class="py-10 text-center">
+        <h1 class="text-4xl font-serif font-bold text-green-900 uppercase tracking-widest">Colección: Bosques</h1>
+        <div class="h-1 w-20 bg-green-600 mx-auto mt-2"></div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
+        
+        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative h-96 cursor-pointer" onclick="if(!event.target.closest('.nav-btn')) this.classList.toggle('flipped')">
+                <div class="inner-card">
+                    <div class="img-container">
+                        <img src="img/Pino.jpg" class="gallery-image opacity-100 z-10">
+                        <img src="img/bosque.jpg" class="gallery-image opacity-0 z-0">
+                        
+                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/20 px-3 py-1 rounded-full">
+                            <button onclick="event.stopPropagation(); changeCardImg(this, 0)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white"></button>
+                            <button onclick="event.stopPropagation(); changeCardImg(this, 1)" class="nav-btn gallery-dot w-2.5 h-2.5 rounded-full bg-white/40"></button>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>El Liquidámbar es conocido por su resina aromática y sus colores otoñales.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-900 bg-white">Liquidámbar</div>
+        </div>
+
+        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative h-96 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="inner-card">
+                    <div class="img-container">
+                        <img src="img/bosque.jpg" class="gallery-image opacity-100 z-10">
+                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>El Pino es el árbol nacional de Honduras, símbolo de fuerza y naturaleza.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-900 bg-white">Pino Nacional</div>
+        </div>
+
+        <div class="photo-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative h-96 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="inner-card">
+                    <div class="img-container">
+                        <img src="img/montaña.jpg" class="gallery-image opacity-100 z-10">
+                        <button onclick="event.stopPropagation(); openLightbox(this)" class="nav-btn absolute top-4 right-4 bg-black/60 text-white p-2 rounded-full z-50 hover:bg-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-8 [transform:rotateY(180deg)] [backface-visibility:hidden] flex items-center justify-center text-center">
+                        <p>Las montañas de Honduras albergan una biodiversidad única en la región.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 text-center font-bold text-green-900 bg-white">Montaña</div>
+        </div>
+
+    </main>
+
+    <div id="imageModal" onclick="closeModalByClick(event)">
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer z-[10002]" onclick="closeModalForce()">&times;</span>
+        <button id="prevBtn" class="modal-nav" onclick="changeLightboxImg(-1, event)">&#10094;</button>
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        <button id="nextBtn" class="modal-nav" onclick="changeLightboxImg(1, event)">&#10095;</button>
+    </div>
+
+    <script>
+        let currentGallery = [];
+        let currentIndex = 0;
+
+        function changeCardImg(dot, idx) {
+            const card = dot.closest('.photo-card');
+            const imgs = card.querySelectorAll('.gallery-image');
+            const dots = card
