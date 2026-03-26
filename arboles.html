@@ -16,12 +16,12 @@
         .front-card, .back-card { backface-visibility: hidden; -webkit-backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
         .back-card { transform: rotateY(180deg); z-index: 20; background: #064e3b; color: white; display: flex; align-items: center; justify-content: center; padding: 2.5rem; text-align: center; }
         
-        /* Modal Corregido */
+        /* Modal */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 85%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; transition: transform 0.3s ease; }
+        #fullImage { max-width: 85%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; }
         
         .nav-arrow { background: rgba(255,255,255,0.1); color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); z-index: 50; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
-        .nav-arrow:hover { background: #16a34a; border-color: transparent; scale: 1.1; }
+        .nav-arrow:hover { background: #16a34a; border-color: transparent; transform: scale(1.1); }
         
         #downloadBtn { margin-top: 24px; background: #16a34a; color: white; padding: 14px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; z-index: 100; }
         .swal2-container { z-index: 10001 !important; }
@@ -42,13 +42,13 @@
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
-                            <img src="img/Pino.jpg" class="preview-img active" data-index="0">
-                            <img src="img/hoja.jpg" class="preview-img" data-index="1">
+                            <img src="img/Pino.jpg" class="preview-img active">
+                            <img src="img/hoja.jpg" class="preview-img">
                             
                             <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2 scale-75">❮</button>
                             <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2 scale-75">❯</button>
                             
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 transition-colors" title="Expandir">
+                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                 </svg>
@@ -68,8 +68,8 @@
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img active" data-index="0">
-                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600 shadow-lg">
+                            <img src="img/bosque.jpg" class="preview-img active">
+                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                 </svg>
@@ -86,11 +86,11 @@
 
     </main>
 
-    <div id="imageModal">
-        <span onclick="closeModal()" class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-green-500 z-[100]">&times;</span>
+    <div id="imageModal" onclick="closeModal()">
+        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-green-500 z-[100]">&times;</span>
         
-        <button onclick="modalNav(-1)" id="modalPrev" class="nav-arrow absolute left-4 md:left-10 top-1/2 -translate-y-1/2">❮</button>
-        <button onclick="modalNav(1)" id="modalNext" class="nav-arrow absolute right-4 md:right-10 top-1/2 -translate-y-1/2">❯</button>
+        <button onclick="modalNav(-1, event)" id="modalPrev" class="nav-arrow absolute left-4 md:left-10 top-1/2 -translate-y-1/2">❮</button>
+        <button onclick="modalNav(1, event)" id="modalNext" class="nav-arrow absolute right-4 md:right-10 top-1/2 -translate-y-1/2">❯</button>
         
         <img id="fullImage" src="" onclick="event.stopPropagation()">
         <button id="downloadBtn" onclick="askDonation(event)">📥 Descargar Fotografía</button>
@@ -103,12 +103,11 @@
             if (!e.target.closest('button')) el.closest('.photo-card').classList.toggle('flipped'); 
         }
 
-        // Navegación en la tarjeta pequeña
         function changeSlide(btn, step, e) {
             if(e) e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
-            if (imgs.length <= 1) return;
+            if (imgs.length <= 1) return 0;
 
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[activeIdx].classList.remove('active');
@@ -117,7 +116,72 @@
             return nextIdx;
         }
 
-        // Abrir Modal
         function openModal(btn, e) {
             e.stopPropagation();
-            current
+            currentAlbumContainer = btn.closest('.img-container');
+            const activeImg = currentAlbumContainer.querySelector('.preview-img.active');
+            const allImgs = currentAlbumContainer.querySelectorAll('.preview-img');
+            
+            // Mostrar u ocultar flechas del modal según cantidad de fotos
+            document.getElementById('modalPrev').style.display = allImgs.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalNext').style.display = allImgs.length > 1 ? 'flex' : 'none';
+
+            document.getElementById('fullImage').src = activeImg.src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function modalNav(step, e) {
+            e.stopPropagation();
+            if (!currentAlbumContainer) return;
+            
+            // Buscamos las imágenes del contenedor actual
+            const imgs = currentAlbumContainer.querySelectorAll('.preview-img');
+            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            
+            // Quitamos clase active de la actual
+            imgs[activeIdx].classList.remove('active');
+            
+            // Calculamos la siguiente
+            let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
+            imgs[nextIdx].classList.add('active');
+            
+            // Actualizamos la imagen del modal
+            document.getElementById('fullImage').src = imgs[nextIdx].src;
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            const imgUrl = document.getElementById('fullImage').src;
+            Swal.fire({
+                title: '¿Apoyas mi trabajo?',
+                text: "Donación voluntaria para seguir capturando la naturaleza.",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                confirmButtonText: 'Donar y Descargar',
+                cancelButtonText: 'Descargar Gratis',
+                heightAuto: false
+            }).then((result) => {
+                if (result.isConfirmed) window.open('TU_LINK_DE_PAYPAL', '_blank');
+                const a = document.createElement('a');
+                a.href = imgUrl;
+                a.download = "foto_naturaleza.jpg";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        }
+
+        // Auto-ocultar flechas en tarjetas con una sola imagen al cargar
+        document.querySelectorAll('.img-container').forEach(c => {
+            if (c.querySelectorAll('.preview-img').length <= 1) {
+                c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'none');
+            }
+        });
+    </script>
+</body>
+</html>
