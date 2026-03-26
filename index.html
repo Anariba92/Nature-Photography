@@ -8,12 +8,14 @@
     <style>
         .album-card:hover .overlay { opacity: 1; }
         .album-card:hover img { transform: scale(1.1); }
+        /* Suavizado de transiciones */
+        .overlay { backdrop-filter: blur(4px); }
     </style>
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans">
 
     <header class="py-16 px-6 text-center bg-white border-b border-stone-200">
-        <h1 class="text-5xl font-serif font-bold text-green-900 mb-4">Exploraciones Naturales</h1>
+        <h1 class="text-5xl font-serif font-bold text-green-900 mb-4 uppercase tracking-tight">Exploraciones Naturales</h1>
         <p class="text-stone-500 italic text-lg">Selecciona una categoría para explorar la colección completa.</p>
         <div class="h-1.5 w-24 bg-green-600 mx-auto mt-6 rounded-full"></div>
     </header>
@@ -23,9 +25,15 @@
             
             <a href="album-insectos.html" class="album-card group relative overflow-hidden rounded-2xl shadow-lg bg-white block">
                 <div class="relative h-96 overflow-hidden">
-                    <img src="img/mariposa.jpg" alt="Álbum Insectos" class="w-full h-full object-cover transition-transform duration-700">
+                    <img src="img/mariposa.jpg" alt="Primer plano de una mariposa colorida en un jardín" class="w-full h-full object-cover transition-transform duration-700" loading="lazy">
                     <div class="overlay absolute inset-0 bg-green-900/60 opacity-0 transition-opacity duration-500 flex flex-col justify-center items-center text-white p-6 text-center">
-                        <span class="text-sm uppercase tracking-widest mb-2">Ver Galería</span>
+                        <div class="mb-4 bg-white/20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm uppercase tracking-widest mb-2 font-semibold">Ver Galería</span>
                         <h2 class="text-3xl font-bold font-serif italic">Insectos</h2>
                         <p class="mt-4 text-sm text-green-100">Mariposas, escarabajos y pequeños habitantes del jardín.</p>
                     </div>
@@ -38,9 +46,15 @@
 
             <a href="arboles.html" class="album-card group relative overflow-hidden rounded-2xl shadow-lg bg-white block">
                 <div class="relative h-96 overflow-hidden">
-                    <img src="img/Pino.jpg" alt="Álbum Árboles" class="w-full h-full object-cover transition-transform duration-700">
+                    <img src="img/Pino.jpg" alt="Pinos hondureños bajo una luz matinal" class="w-full h-full object-cover transition-transform duration-700" loading="lazy">
                     <div class="overlay absolute inset-0 bg-green-900/60 opacity-0 transition-opacity duration-500 flex flex-col justify-center items-center text-white p-6 text-center">
-                        <span class="text-sm uppercase tracking-widest mb-2">Ver Galería</span>
+                        <div class="mb-4 bg-white/20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm uppercase tracking-widest mb-2 font-semibold">Ver Galería</span>
                         <h2 class="text-3xl font-bold font-serif italic">Árboles</h2>
                         <p class="mt-4 text-sm text-green-100">Majestuosos gigantes y especies maderables de la región.</p>
                     </div>
@@ -53,9 +67,15 @@
 
             <a href="album-flora.html" class="album-card group relative overflow-hidden rounded-2xl shadow-lg bg-white block">
                 <div class="relative h-96 overflow-hidden">
-                    <img src="img/flor.jpg" alt="Álbum Flora" class="w-full h-full object-cover transition-transform duration-700">
+                    <img src="img/flor.jpg" alt="Detalle macro de una flor silvestre" class="w-full h-full object-cover transition-transform duration-700" loading="lazy">
                     <div class="overlay absolute inset-0 bg-green-900/60 opacity-0 transition-opacity duration-500 flex flex-col justify-center items-center text-white p-6 text-center">
-                        <span class="text-sm uppercase tracking-widest mb-2">Ver Galería</span>
+                        <div class="mb-4 bg-white/20 p-3 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm uppercase tracking-widest mb-2 font-semibold">Ver Galería</span>
                         <h2 class="text-3xl font-bold font-serif italic">Flora</h2>
                         <p class="mt-4 text-sm text-green-100">Detalles de flores silvestres y plantas ornamentales.</p>
                     </div>
@@ -65,10 +85,21 @@
                     <p class="text-green-700 text-sm font-semibold mt-1">15 Fotografías →</p>
                 </div>
             </a>
-
         </div>
     </main>
 
-    <footer class="bg-stone-900 text-white py-12">
+    <footer class="bg-stone-900 text-white py-16">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-2xl font-serif
+            <h2 class="text-3xl font-serif font-bold mb-4">Capturando la esencia de lo natural</h2>
+            <p class="text-stone-400 max-w-lg mx-auto mb-8">Un proyecto dedicado a documentar la biodiversidad y los paisajes forestales con un enfoque en la conservación.</p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <span class="text-stone-500 hover:text-green-500 cursor-pointer">Instagram</span>
+                <span class="text-stone-500 hover:text-green-500 cursor-pointer">Email</span>
+            </div>
+            <div class="h-px w-full bg-stone-800 mb-8"></div>
+            <p class="text-stone-600 text-sm italic">© 2026 Portafolio de Naturaleza. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
