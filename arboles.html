@@ -69,6 +69,10 @@
                     <div class="front-card bg-white shadow-2xl">
                         <div class="img-container">
                             <img src="img/bosque.jpg" class="preview-img active">
+                            
+                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2 scale-75">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2 scale-75">❯</button>
+
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -79,6 +83,32 @@
                     </div>
                     <div class="back-card">
                         <p class="text-lg italic font-serif">"Los pinos son la especie más predominante de Honduras, considerado el árbol nacional."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-card" data-album="3">
+            <div class="relative cursor-pointer h-full" onclick="handleFlip(this, event)">
+                <div class="inner-card">
+                    <div class="front-card bg-white shadow-2xl">
+                        <div class="img-container">
+                            <img src="img/bellota.jpg" class="preview-img active">
+                            <img src="img/roble_hoja.jpg" class="preview-img">
+                            
+                            <button onclick="changeSlide(this, -1, event)" class="nav-arrow absolute left-3 top-1/2 -translate-y-1/2 scale-75">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="nav-arrow absolute right-3 top-1/2 -translate-y-1/2 scale-75">❯</button>
+
+                            <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-5 text-center font-bold text-green-900 uppercase tracking-widest">Roble Real</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="text-lg italic font-serif">"El roble es conocido por su madera extremadamente dura y su importancia en los ecosistemas de montaña."</p>
                     </div>
                 </div>
             </div>
@@ -103,6 +133,7 @@
             if (!e.target.closest('button')) el.closest('.photo-card').classList.toggle('flipped'); 
         }
 
+        // Función para cambiar de imagen en la tarjeta pequeña
         function changeSlide(btn, step, e) {
             if(e) e.stopPropagation();
             const container = btn.closest('.img-container');
@@ -116,13 +147,14 @@
             return nextIdx;
         }
 
+        // Función para abrir el modal
         function openModal(btn, e) {
             e.stopPropagation();
             currentAlbumContainer = btn.closest('.img-container');
             const activeImg = currentAlbumContainer.querySelector('.preview-img.active');
             const allImgs = currentAlbumContainer.querySelectorAll('.preview-img');
             
-            // Mostrar u ocultar flechas del modal según cantidad de fotos
+            // Si solo hay una imagen en ese bloque, ocultamos flechas del modal
             document.getElementById('modalPrev').style.display = allImgs.length > 1 ? 'flex' : 'none';
             document.getElementById('modalNext').style.display = allImgs.length > 1 ? 'flex' : 'none';
 
@@ -134,22 +166,18 @@
             document.getElementById('imageModal').style.display = 'none';
         }
 
+        // Navegación dentro del modal
         function modalNav(step, e) {
             e.stopPropagation();
             if (!currentAlbumContainer) return;
             
-            // Buscamos las imágenes del contenedor actual
             const imgs = currentAlbumContainer.querySelectorAll('.preview-img');
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             
-            // Quitamos clase active de la actual
             imgs[activeIdx].classList.remove('active');
-            
-            // Calculamos la siguiente
             let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
             imgs[nextIdx].classList.add('active');
             
-            // Actualizamos la imagen del modal
             document.getElementById('fullImage').src = imgs[nextIdx].src;
         }
 
@@ -176,12 +204,20 @@
             });
         }
 
-        // Auto-ocultar flechas en tarjetas con una sola imagen al cargar
-        document.querySelectorAll('.img-container').forEach(c => {
-            if (c.querySelectorAll('.preview-img').length <= 1) {
-                c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'none');
-            }
-        });
+        // Función que revisa todos los bloques al cargar la página
+        function checkArrows() {
+            document.querySelectorAll('.img-container').forEach(c => {
+                const imgs = c.querySelectorAll('.preview-img').length;
+                if (imgs <= 1) {
+                    c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'none');
+                } else {
+                    c.querySelectorAll('.nav-arrow').forEach(arr => arr.style.display = 'flex');
+                }
+            });
+        }
+
+        // Ejecutar al cargar
+        window.onload = checkArrows;
     </script>
 </body>
 </html>
