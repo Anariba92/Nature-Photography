@@ -6,8 +6,10 @@
     <title>Álbum: Árboles | Bosques</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .photo-card:hover img { transform: scale(1.05); transition: 0.3s; }
+        /* Zoom suave al pasar el mouse sobre la tarjeta */
+        .photo-card:hover .img-container img { transform: scale(1.1); }
         .flipped .inner-card { transform: rotateY(180deg); }
+        .img-container { overflow: hidden; }
     </style>
 </head>
 <body class="bg-stone-100 text-stone-800">
@@ -32,8 +34,8 @@
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
                 <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
                     <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                            <img src="img/Pino.jpg" alt="Fotografia de fuste de un Liquidambar en Honduras." class="w-full h-full object-cover">
+                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
+                            <img src="img/Pino.jpg" alt="Detalle Liquidámbar" class="w-full h-full object-cover scale-125 object-top transition-transform duration-500">
                             <button type="button" onclick="event.stopPropagation(); openImage('img/Pino.jpg')" class="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-full z-10 hover:bg-green-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -43,7 +45,7 @@
                         </div>
                         <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
                             <h3 class="text-xl font-bold mb-2 italic">Liquidámbar Styraciflua</h3>
-                            <p class="text-sm">Árbol caducifolio de gran valor ornamental, famoso por sus hojas estrelladas que tornan a colores intensos en otoño. Alcanza entre 20 y 40 metros de altura.</p>
+                            <p class="text-sm">Árbol caducifolio famoso por sus hojas estrelladas que tornan a colores intensos en otoño.</p>
                         </div>
                     </div>
                 </div>
@@ -53,66 +55,7 @@
             <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
                 <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
                     <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                            <img src="img/bosque.jpg" alt="Fotografia de bosque de pino en Honduras." class="w-full h-full object-cover">
+                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden] img-container">
+                            <img src="img/bosque.jpg" alt="Detalle Pino" class="w-full h-full object-cover scale-150 object-center transition-transform duration-500">
                             <button type="button" onclick="event.stopPropagation(); openImage('img/bosque.jpg')" class="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-full z-10 hover:bg-green-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                </svg>
-                            </button>
-                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">Info ↺</div>
-                        </div>
-                        <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
-                            <h3 class="text-xl font-bold mb-2 italic">Pinus sp.</h3>
-                            <p class="text-sm">En Honduras podemos encontrar 7 especies diferentes de pino y por ello es considerado el Árbol Nacional.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4"><h3 class="font-bold text-green-800">Nombre común: Pino</h3></div>
-            </div>
-
-            <div class="photo-card bg-white rounded-lg overflow-hidden shadow-sm border border-stone-200">
-                <div class="relative w-full h-80 cursor-pointer group" onclick="this.classList.toggle('flipped')">
-                    <div class="inner-card relative w-full h-full duration-500 [transform-style:preserve-3d]">
-                        <div class="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-                            <img src="img/montaña.jpg" alt="Panorámica de bosque en San Juancito, Francisco Morazán." class="w-full h-full object-cover">
-                            <button type="button" onclick="event.stopPropagation(); openImage('img/montaña.jpg')" class="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-full z-10 hover:bg-green-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                                </svg>
-                            </button>
-                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-xs">Info ↺</div>
-                        </div>
-                        <div class="absolute inset-0 w-full h-full bg-green-900 text-white p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
-                            <h3 class="text-xl font-bold mb-2 italic">Bosque Conifera.</h3>
-                            <p class="text-sm">Panóramica de bosque en San Juancito, Francisco Morazán.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4"><h3 class="font-bold text-green-800"></h3></div>
-            </div>
-            
-        </div> </main>
-
-    <div id="imageModal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-4 cursor-pointer" onclick="closeImage()">
-        <span class="absolute top-6 right-6 text-white text-4xl">&times;</span>
-        <img id="fullImage" src="" class="max-w-full max-h-full rounded-lg shadow-2xl transition-all transform scale-95">
-    </div>
-
-    <script>
-        function openImage(src) {
-            const modal = document.getElementById('imageModal');
-            const img = document.getElementById('fullImage');
-            img.src = src;
-            modal.classList.remove('hidden');
-            setTimeout(() => img.classList.remove('scale-95'), 10);
-        }
-        function closeImage() {
-            const modal = document.getElementById('imageModal');
-            const img = document.getElementById('fullImage');
-            img.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-    </script>
-</body>
-</html>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill
