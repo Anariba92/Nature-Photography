@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Forestal Pro</title>
+    <title>Álbum Forestal Pro - Corregido</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Vista previa recortada */
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         .preview-img { width: 100%; height: 100%; object-fit: cover; position: absolute; transition: opacity 0.4s ease; }
 
         /* Efecto Flip */
+        .photo-card { perspective: 1000px; }
         .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 380px; }
         .flipped .inner-card { transform: rotateY(180deg); }
         .back-card { transform: rotateY(180deg); backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
         .front-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
 
-        /* Modal Pantalla Completa */
+        /* Modal */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; }
         #fullImage { max-width: 90%; max-height: 85vh; object-fit: contain; }
 
-        /* Navegación */
-        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; padding: 12px; border-radius: 50%; cursor: pointer; z-index: 60; transition: 0.3s; }
+        .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; padding: 12px; border-radius: 50%; cursor: pointer; z-index: 60; transition: 0.3s; border: none; }
         .nav-arrow:hover { background: #16a34a; scale: 1.1; }
         
-        /* Ocultar si solo hay una imagen */
         .hide-nav .nav-arrow, .hide-nav .dots-container { display: none !important; }
     </style>
 </head>
@@ -32,10 +30,10 @@
 
     <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
-        <div class="photo-card bg-white rounded-2xl shadow-xl" data-id="bosque">
+        <div class="photo-card" data-id="bosque">
             <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card">
+                    <div class="front-card bg-white shadow-xl">
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/hoja.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
@@ -46,24 +44,24 @@
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
 
                             <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
-                                <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/40"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/40"></div>
+                                <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
+                                <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
+                                <div onclick="switchImgByDot(this, 2, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
                             </div>
                         </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Bosque Liquidámbar</div>
                     </div>
-                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center">
-                        <p>Información detallada sobre el Bosque de Liquidámbar.</p>
+                    <div class="back-card bg-green-900 text-white p-8 flex items-center justify-center text-center shadow-xl">
+                        <p>El Liquidámbar destaca por sus hojas en forma de estrella y colores otoñales intensos.</p>
                     </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-900 uppercase">Bosque Liquidámbar</div>
         </div>
 
-        <div class="photo-card bg-white rounded-2xl shadow-xl" data-id="pino">
+        <div class="photo-card" data-id="pino">
             <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card">
+                    <div class="front-card bg-white shadow-xl">
                         <div class="img-container">
                             <img src="img/bosque.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <img src="img/pino-detalle.jpg" class="preview-img" style="opacity: 0; z-index: 0;">
@@ -73,24 +71,117 @@
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
 
                             <div class="dots-container absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-50 bg-black/30 p-2 rounded-full">
-                                <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-white/40"></div>
+                                <div onclick="switchImgByDot(this, 0, event)" class="w-2.5 h-2.5 rounded-full bg-white cursor-pointer"></div>
+                                <div onclick="switchImgByDot(this, 1, event)" class="w-2.5 h-2.5 rounded-full bg-white/40 cursor-pointer"></div>
                             </div>
                         </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Nacional</div>
                     </div>
-                    <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center">Información sobre el Pino.</div>
+                    <div class="back-card bg-green-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
+                        <p>El Pino (Pinus oocarpa) es el árbol nacional de Honduras, símbolo de vigor.</p>
+                    </div>
                 </div>
             </div>
-            <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Nacional</div>
         </div>
 
-        <div class="photo-card bg-white rounded-2xl shadow-xl hide-nav" data-id="montaña">
+        <div class="photo-card hide-nav" data-id="montaña">
             <div class="relative cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card">
+                    <div class="front-card bg-white shadow-xl">
                         <div class="img-container">
                             <img src="img/montaña.jpg" class="preview-img" style="opacity: 1; z-index: 10;">
                             <button onclick="openModal(this, event)" class="absolute top-4 right-4 bg-black/60 text-white p-3 rounded-full z-50 hover:bg-green-600">🔍</button>
                         </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Montaña</div>
                     </div>
-                    <div
+                    <div class="back-card bg-stone-800 text-white p-8 flex items-center justify-center text-center shadow-xl">
+                        <p>Las montañas regulan el clima y son hogar de miles de especies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="imageModal" onclick="this.style.display='none'">
+        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer">&times;</span>
+        <button class="nav-arrow left-6 text-2xl" onclick="moveModal(-1, event)">❮</button>
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        <button class="nav-arrow right-6 text-2xl" onclick="moveModal(1, event)">❯</button>
+        <div id="counter" class="absolute bottom-8 text-white font-mono bg-black/40 px-4 py-1 rounded-full"></div>
+    </div>
+
+    <script>
+        let currentGallery = [];
+        let modalIdx = 0;
+
+        function handleFlip(el, e) {
+            // Solo gira si NO haces clic en un botón o en los puntos
+            if (!e.target.closest('button') && !e.target.closest('.dots-container')) {
+                el.closest('.photo-card').classList.toggle('flipped');
+            }
+        }
+
+        function updateUI(card, index) {
+            const imgs = card.querySelectorAll('.preview-img');
+            const dots = card.querySelectorAll('.dots-container div');
+            imgs.forEach((img, i) => {
+                img.style.opacity = (i === index) ? "1" : "0";
+                img.style.zIndex = (i === index) ? "10" : "0";
+            });
+            dots.forEach((dot, i) => {
+                dot.style.backgroundColor = (i === index) ? "white" : "rgba(255,255,255,0.4)";
+            });
+        }
+
+        function moveImg(btn, step, e) {
+            e.stopPropagation();
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            let active = 0;
+            imgs.forEach((img, i) => { if (img.style.opacity === "1") active = i; });
+            let next = (active + step + imgs.length) % imgs.length;
+            updateUI(card, next);
+        }
+
+        function switchImgByDot(dot, index, e) {
+            e.stopPropagation();
+            const card = dot.closest('.photo-card');
+            updateUI(card, index);
+        }
+
+        function openModal(btn, e) {
+            e.stopPropagation();
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            currentGallery = Array.from(imgs).map(img => img.src);
+            imgs.forEach((img, i) => { if (img.style.opacity === "1") modalIdx = i; });
+            
+            const isMulti = currentGallery.length > 1;
+            document.querySelectorAll('#imageModal .nav-arrow, #counter').forEach(el => el.style.display = isMulti ? 'block' : 'none');
+            
+            showModalImg();
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function moveModal(step, e) {
+            e.stopPropagation();
+            modalIdx = (modalIdx + step + currentGallery.length) % currentGallery.length;
+            showModalImg();
+        }
+
+        function showModalImg() {
+            document.getElementById('fullImage').src = currentGallery[modalIdx];
+            document.getElementById('counter').innerText = `${modalIdx + 1} / ${currentGallery.length}`;
+        }
+
+        window.onkeydown = (e) => {
+            if (document.getElementById('imageModal').style.display === 'flex') {
+                if (e.key === "ArrowLeft") moveModal(-1, e);
+                if (e.key === "ArrowRight") moveModal(1, e);
+                if (e.key === "Escape") document.getElementById('imageModal').style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
