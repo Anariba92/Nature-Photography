@@ -9,7 +9,6 @@
         .album-card:hover .overlay { opacity: 1; }
         .album-card:hover img { transform: scale(1.1); }
         .overlay { backdrop-filter: blur(6px); transition: all 0.5s ease; }
-        /* Animación suave de entrada */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.8s ease forwards; }
     </style>
@@ -18,24 +17,34 @@
 
     <header class="py-20 px-6 text-center bg-white border-b border-stone-200">
         <h1 class="text-4xl md:text-6xl font-serif font-bold text-green-900 mb-4 uppercase tracking-tighter fade-in">Naturaleza en Lente</h1>
-        <p class="text-stone-500 italic text-lg max-w-2xl mx-auto fade-in" style="animation-delay: 0.2s;">Selecciona una categoría para explorar la biodiversidad de nuestra región.</p>
+        <p class="text-stone-500 italic text-lg max-w-2xl mx-auto fade-in" style="animation-delay: 0.2s;">Selecciona una categoría para explorar la biodiversidad local.</p>
         <div class="h-1.5 w-24 bg-green-600 mx-auto mt-8 rounded-full fade-in" style="animation-delay: 0.4s;"></div>
     </header>
 
     <main class="max-w-6xl mx-auto px-6 py-20">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
             
-            <a href="arboles.html" class="album-card group relative overflow-hidden rounded-3xl shadow-2xl bg-white block fade-in" style="animation-delay: 0.5s;">
+            <a href="album-insectos.html" class="album-card group relative overflow-hidden rounded-3xl shadow-2xl bg-white block fade-in" style="animation-delay: 0.5s;">
+                <div class="relative h-[28rem] overflow-hidden">
+                    <img src="img/mariposa.jpg" alt="Insectos" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                    <div class="overlay absolute inset-0 bg-green-950/50 opacity-0 flex flex-col justify-center items-center text-white p-8 text-center">
+                        <h2 class="text-4xl font-serif italic font-bold">Insectos</h2>
+                        <p class="mt-4 text-sm font-light">Pequeños habitantes y polinizadores de nuestro entorno.</p>
+                        <span class="mt-6 px-6 py-2 bg-white text-green-900 rounded-full text-xs font-bold uppercase tracking-widest">Ver Galería</span>
+                    </div>
+                </div>
+                <div class="p-6 bg-white flex justify-between items-center">
+                    <span class="font-bold text-stone-700">Micro Mundo</span>
+                    <span class="text-green-600 text-sm font-bold tracking-tighter">12 FOTOS →</span>
+                </div>
+            </a>
+
+            <a href="arboles.html" class="album-card group relative overflow-hidden rounded-3xl shadow-2xl bg-white block fade-in" style="animation-delay: 0.6s;">
                 <div class="relative h-[28rem] overflow-hidden">
                     <img src="img/Pino.jpg" alt="Árboles" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
                     <div class="overlay absolute inset-0 bg-green-950/50 opacity-0 flex flex-col justify-center items-center text-white p-8 text-center">
-                        <div class="mb-4 bg-white/20 p-4 rounded-full border border-white/30">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
                         <h2 class="text-4xl font-serif italic font-bold">Árboles</h2>
-                        <p class="mt-4 text-sm font-light">Gigantes maderables y el alma de nuestros bosques.</p>
+                        <p class="mt-4 text-sm font-light">Majestuosos gigantes y especies forestales.</p>
                         <span class="mt-6 px-6 py-2 bg-white text-green-900 rounded-full text-xs font-bold uppercase tracking-widest">Ver Galería</span>
                     </div>
                 </div>
@@ -45,8 +54,30 @@
                 </div>
             </a>
 
-            </div>
+            <a href="album-flora.html" class="album-card group relative overflow-hidden rounded-3xl shadow-2xl bg-white block fade-in" style="animation-delay: 0.7s;">
+                <div class="relative h-[28rem] overflow-hidden">
+                    <img src="img/flor.jpg" alt="Flora" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                    <div class="overlay absolute inset-0 bg-green-950/50 opacity-0 flex flex-col justify-center items-center text-white p-8 text-center">
+                        <h2 class="text-4xl font-serif italic font-bold">Flora</h2>
+                        <p class="mt-4 text-sm font-light">Detalles de flores silvestres y plantas ornamentales.</p>
+                        <span class="mt-6 px-6 py-2 bg-white text-green-900 rounded-full text-xs font-bold uppercase tracking-widest">Ver Galería</span>
+                    </div>
+                </div>
+                <div class="p-6 bg-white flex justify-between items-center">
+                    <span class="font-bold text-stone-700">Flores</span>
+                    <span class="text-green-600 text-sm font-bold tracking-tighter">15 FOTOS →</span>
+                </div>
+            </a>
+
+        </div>
     </main>
+
+    <footer class="bg-stone-900 text-white py-16 text-center">
+        <p class="text-stone-500 text-xs italic">© 2026 Portafolio de Naturaleza. Honduras.</p>
+    </footer>
+
+</body>
+</html>
 
     <footer class="bg-stone-900 text-white py-16 text-center">
         <p class="text-stone-400 max-w-lg mx-auto mb-6 px-6">Documentando la biodiversidad para fomentar su conservación y aprecio visual.</p>
