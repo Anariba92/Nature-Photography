@@ -2,249 +2,82 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Álbum Bosques | Honduras</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* 1. EFECTO DE RECORTE EN LA TARJETA */
-        .img-container { 
-            height: 350px; 
-            overflow: hidden; 
-            position: relative; 
-            background: #111; 
-            border-radius: 1rem 1rem 0 0; 
-        }
-        
+        /* PREVIEW: Recortado (Zoom 2x) */
+        .img-container { height: 350px; overflow: hidden; position: relative; background: #000; border-radius: 1rem 1rem 0 0; }
         .preview-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            position: absolute; 
-            transition: opacity 0.5s ease, transform 0.5s ease; 
-            opacity: 0; 
-            z-index: 0;
-            /* Zoom forzado para que solo se vea una parte en el previo */
-            transform: scale(1.8); 
+            width: 100%; height: 100%; object-fit: cover; position: absolute; 
+            transition: opacity 0.4s; opacity: 0;
+            transform: scale(2); /* AQUÍ SE RECORTA */
         }
-        
-        .preview-img.active { 
-            opacity: 1; 
-            z-index: 10; 
-        }
+        .preview-img.active { opacity: 1; }
 
-        /* 2. TARJETA 3D */
-        .photo-card { perspective: 1000px; height: 480px; }
-        .inner-card { 
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
-            transform-style: preserve-3d; 
-            position: relative; width: 100%; height: 100%; 
-        }
-        .flipped .inner-card { transform: rotateY(180deg); }
-        .front-card, .back-card { 
-            backface-visibility: hidden; 
-            position: absolute; inset: 0; 
-            border-radius: 1rem; overflow: hidden; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .back-card { 
-            transform: rotateY(180deg); 
-            background: #064e3b; color: white; 
-            display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
-            padding: 2rem; text-align: center; 
-        }
-
-        /* 3. MODAL Y ZOOM DE AMPLIACIÓN */
+        /* MODAL: RESET TOTAL PARA VERLA COMPLETA */
         #imageModal { 
-            display: none; 
-            position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); 
-            z-index: 9999; 
-            align-items: center; justify-content: center; 
-            flex-direction: column; 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); z-index: 9999; 
+            flex-direction: column; align-items: center; justify-content: center; 
         }
-        
-        .modal-content-wrapper {
-            position: relative;
-            max-width: 90%;
-            max-height: 80vh;
-            overflow: hidden; /* Para que el zoom no se salga del contenedor */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         #fullImage { 
-            max-width: 100%; 
-            max-height: 80vh; 
-            object-fit: contain; 
-            cursor: zoom-in; 
-            transition: transform 0.3s ease;
-            /* En el modal eliminamos el recorte del previo */
-            transform: scale(1); 
+            max-width: 90%; max-height: 80vh; 
+            object-fit: contain; /* ESTO ASEGURA QUE SE VEA TODA */
+            transform: scale(1) !important; /* RESETEA EL RECORTE */
+            transition: transform 0.3s ease; cursor: zoom-in;
         }
+        /* AMPLIACIÓN AL HACER CLIC */
+        #fullImage.zoomed { transform: scale(2) !important; cursor: zoom-out; }
 
-        /* Clase que se activa al hacer clic para ampliar */
-        #fullImage.zoomed { 
-            transform: scale(2); 
-            cursor: zoom-out; 
-        }
-
+        .photo-card { perspective: 1000px; height: 480px; }
+        .inner-card { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
+        .flipped .inner-card { transform: rotateY(180deg); }
+        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; }
+        .back-card { transform: rotateY(180deg); background: #064e3b; color: white; display: flex; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
         .hidden-card { display: none !important; }
-        body { padding-top: 10rem; }
     </style>
 </head>
-<body class="bg-stone-100 p-4">
+<body class="bg-stone-100 p-4 pt-32">
 
-    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
-            <a href="index.html" class="bg-green-800 text-white px-6 py-2 rounded-full font-bold hover:bg-green-700 transition-all">❮ MENÚ</a>
-            <div class="flex gap-2">
-                <input type="text" id="searchInput" oninput="filtrar()" placeholder="Buscar..." class="px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
-                <select id="yearFilter" onchange="filtrar()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white">
-                    <option value="all">Todos los años</option>
-                    <option value="2026">2026</option>
-                </select>
-            </div>
+    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md p-4 z-[100] border-b">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <button class="bg-green-800 text-white px-6 py-2 rounded-full font-bold">MENÚ</button>
+            <input type="text" id="searchInput" oninput="filtrar()" placeholder="Buscar..." class="border p-2 rounded-xl">
         </div>
     </nav>
 
-    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <div class="photo-card" data-name="liquidambar" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white">
-                        <div class="img-container">
-                            <img src="img/Pino.jpg" class="preview-img active">
-                            <img src="img/hoja.jpg" class="preview-img">
-                            
-                            <button onclick="changeSlide(this, -1, event)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full z-30 hover:bg-green-600">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full z-30 hover:bg-green-600">❯</button>
-                            
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-40 shadow-lg hover:scale-110 transition-transform">🔍</button>
-                        </div>
-                        <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase">Liquidámbar</h3>
-                        </div>
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="photo-card" data-name="pino">
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white shadow-lg">
+                    <div class="img-container">
+                        <img src="img/Pino.jpg" class="preview-img active">
+                        <button onclick="event.stopPropagation(); openModal(this)" class="absolute top-4 right-4 bg-green-600 text-white p-3 rounded-full z-50">🔍</button>
                     </div>
-                    <div class="back-card">
-                        <p class="italic">"Detalle de la hoja en otoño."</p>
-                    </div>
+                    <div class="p-4 text-center font-bold">PINO HONDUREÑO</div>
                 </div>
+                <div class="back-card">Bosque de coníferas.</div>
             </div>
         </div>
+        </main>
 
-        <div class="photo-card" data-name="san juancito" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white">
-                        <div class="img-container">
-                            <img src="img/montaña.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-40 shadow-lg hover:scale-110">🔍</button>
-                        </div>
-                        <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase">San Juancito</h3>
-                        </div>
-                    </div>
-                    <div class="back-card">
-                        <p class="italic">"Paisaje desde la montaña."</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card" data-name="pinos bosque" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white">
-                        <div class="img-container">
-                            <img src="img/hoja.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-40 shadow-lg hover:scale-110">🔍</button>
-                        </div>
-                        <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase">Bosque de Pino</h3>
-                        </div>
-                    </div>
-                    <div class="back-card">
-                        <p class="italic">"Naturaleza pura."</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <div id="imageModal">
-        <span onclick="closeModal()" class="absolute top-5 right-10 text-white text-6xl cursor-pointer hover:text-green-500 z-[10000]">&times;</span>
-        <p class="text-white/70 text-sm mb-4">Haz clic en la imagen para ampliar/reducir</p>
-        <div class="modal-content-wrapper">
-            <img id="fullImage" src="" onclick="toggleZoom(event)">
-        </div>
-        <button onclick="descargar()" class="mt-8 bg-green-600 text-white px-10 py-3 rounded-full font-bold shadow-xl hover:bg-green-500 transition-colors">📥 Descargar Foto</button>
+    <div id="imageModal" onclick="closeModal()">
+        <span class="absolute top-5 right-10 text-white text-6xl cursor-pointer">&times;</span>
+        <img id="fullImage" src="" onclick="event.stopPropagation(); this.classList.toggle('zoomed')">
+        <button onclick="event.stopPropagation(); alert('Descargando...')" class="mt-8 bg-green-600 text-white px-10 py-3 rounded-full font-bold">Descargar</button>
     </div>
 
     <script>
-        // 1. CAMBIAR IMAGEN DENTRO DE LA TARJETA (GALERÍA)
-        function changeSlide(btn, step, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const slides = container.querySelectorAll('.preview-img');
-            let activeIdx = Array.from(slides).findIndex(s => s.classList.contains('active'));
-            
-            slides[activeIdx].classList.remove('active');
-            let nextIdx = (activeIdx + step + slides.length) % slides.length;
-            slides[nextIdx].classList.add('active');
-        }
-
-        // 2. VOLTEAR TARJETA
-        function handleFlip(card, e) {
-            if (e.target.closest('button')) return;
-            card.classList.toggle('flipped');
-        }
-
-        // 3. ABRIR MODAL (MUESTRA FOTO COMPLETA)
-        function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const activeImg = container.querySelector('.preview-img.active').src;
-            const modalImg = document.getElementById('fullImage');
-            
-            modalImg.src = activeImg;
-            modalImg.classList.remove('zoomed'); // Inicia sin zoom
+        function openModal(btn) {
+            const src = btn.parentElement.querySelector('.preview-img').src;
+            const img = document.getElementById('fullImage');
+            img.src = src;
+            img.classList.remove('zoomed');
             document.getElementById('imageModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Bloquea scroll
         }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // 4. AMPLIAR IMAGEN EN EL MODAL (ZOOM)
-        function toggleZoom(e) {
-            e.stopPropagation();
-            e.target.classList.toggle('zoomed');
-        }
-
-        // 5. FILTRAR CONTENIDO
-        function filtrar() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const year = document.getElementById('yearFilter').value;
-            const cards = document.querySelectorAll('.photo-card');
-
-            cards.forEach(c => {
-                const name = c.getAttribute('data-name').toLowerCase();
-                const cYear = c.getAttribute('data-year');
-                const match = name.includes(query) && (year === 'all' || year === cYear);
-                c.classList.toggle('hidden-card', !match);
-            });
-        }
-
-        function descargar() {
-            Swal.fire('Descarga', 'La imagen se ha guardado correctamente.', 'success');
-        }
+        function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
+        function filtrar() { /* Tu lógica de filtro aquí */ }
     </script>
 </body>
 </html>
