@@ -24,10 +24,10 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
         
+        /* Modal Mejorado */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; }
+        #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; cursor: default; }
         
-        /* CLASE CLAVE: Si no está esta clase, el filtro no funciona */
         .hidden-card { display: none !important; }
     </style>
 </head>
@@ -57,15 +57,15 @@
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
-                            <img src="img/Pino.jpg" class="preview-img active">
-                            <img src="img/hoja.jpg" class="preview-img">
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 bg-black/30 text-white p-2 rounded-full z-20">❯</button>
+                            <img src="img/Pino.jpg" class="preview-img active" loading="lazy">
+                            <img src="img/hoja.jpg" class="preview-img" loading="lazy">
+                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20 hover:bg-black/50">❯</button>
                             <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
                         </div>
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Bosques frescos y hojas estrelladas."</p>
+                        <p class="italic">"Se puede encontrar en climas frescos y tiene una hojas particular en forma estrelladas."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -77,13 +77,13 @@
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
-                            <img src="img/montaña.jpg" class="preview-img active">
+                            <img src="img/montaña.jpg" class="preview-img active" loading="lazy">
                             <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">San Juancito</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Panorámica desde Francisco Morazán."</p>
+                        <p class="italic">"Panorámica desde San Juancito, en Francisco Morazán."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -95,13 +95,13 @@
                 <div class="inner-card">
                     <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img active">
+                            <img src="img/bosque.jpg" class="preview-img active" loading="lazy">
                             <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
                         </div>
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Honduras tiene 7 especies de pino."</p>
+                        <p class="italic">"En Honduras podemos encontrar 7 especies de pino."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -110,27 +110,24 @@
 
     </main>
 
-    <div id="imageModal" onclick="closeModal()">
-        <span class="absolute top-5 right-10 text-white text-4xl cursor-pointer">&times;</span>
-        <img id="fullImage" src="">
-        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-6 py-2 rounded-full font-bold">Descargar Foto</button>
+    <div id="imageModal" onclick="closeModal(event)">
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-500 transition-colors">Descargar Foto</button>
     </div>
 
     <script>
-        // --- 1. CONFIGURACIÓN AL CARGAR LA PÁGINA ---
+        // 1. CARGA INICIAL
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
             const listaAnios = new Set();
-
-            console.log("Sistema iniciado. Tarjetas encontradas:", tarjetas.length);
 
             tarjetas.forEach(t => {
                 const anio = t.getAttribute('data-year');
                 if(anio) listaAnios.add(anio);
             });
 
-            // Llenar el select automáticamente
             Array.from(listaAnios).sort().reverse().forEach(anio => {
                 const opt = document.createElement('option');
                 opt.value = anio;
@@ -139,7 +136,7 @@
             });
         });
 
-        // --- 2. FUNCIÓN DE FILTRADO (Buscador + Año) ---
+        // 2. FILTRADO
         function filtrarContenido() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const anioFiltro = document.getElementById('yearFilter').value;
@@ -148,32 +145,32 @@
             tarjetas.forEach(tarjeta => {
                 const nombre = (tarjeta.getAttribute('data-name') || "").toLowerCase();
                 const anio = tarjeta.getAttribute('data-year') || "";
-
                 const coincideTexto = nombre.includes(input);
                 const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
 
-                // Si cumple AMBAS condiciones, se muestra
-                if (coincideTexto && coincideAnio) {
-                    tarjeta.classList.remove('hidden-card');
-                } else {
-                    tarjeta.classList.add('hidden-card');
-                }
+                tarjeta.classList.toggle('hidden-card', !(coincideTexto && coincideAnio));
             });
         }
 
-        // --- 3. FUNCIONES DE INTERACCIÓN ---
+        // 3. INTERACCIONES
         function handleFlip(card, e) {
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
 
+        // Mejora: Navegación circular robusta
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
+            if (imgs.length <= 1) return;
+
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[activeIdx].classList.remove('active');
-            imgs[(activeIdx + step) % imgs.length].classList.add('active');
+            
+            // Fórmula circular para manejar negativos y positivos
+            let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
+            imgs[nextIdx].classList.add('active');
         }
 
         function openModal(btn, e) {
@@ -184,8 +181,11 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
+        // Mejora: Evita cierre accidental al tocar la imagen o botón
+        function closeModal(e) {
+            if (e.target.id === 'imageModal') {
+                document.getElementById('imageModal').style.display = 'none';
+            }
         }
 
         function askDonation(e) {
@@ -195,16 +195,19 @@
                 text: "Puedes apoyarnos con una donación o descargar gratis.",
                 icon: 'question',
                 showCancelButton: true,
+                confirmButtonColor: '#059669',
+                cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Donar y bajar',
                 cancelButtonText: 'Bajar gratis'
-            }).then(() => {
-                const link = document.createElement('a');
-                link.href = document.getElementById('fullImage').src;
-                link.download = 'foto-bosque.jpg';
-                link.click();
+            }).then((result) => {
+                if (result.isConfirmed || result.dismiss === Swal.DismissReason.cancel) {
+                    const link = document.createElement('a');
+                    link.href = document.getElementById('fullImage').src;
+                    link.download = 'foto-bosque.jpg';
+                    link.click();
+                }
             });
         }
     </script>
 </body>
 </html>
-
