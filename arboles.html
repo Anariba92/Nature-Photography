@@ -28,18 +28,16 @@
         #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; cursor: default; }
         
         .hidden-card { display: none !important; }
-
-        /* SweetAlert al frente siempre */
         .swal2-container { z-index: 10000 !important; }
 
-        /* Botones de navegación modal */
+        /* Botones Navegación Modal */
         .nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(255,255,255,0.1); color: white; border-radius: 50%;
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
             font-size: 24px; transition: all 0.3s; z-index: 100;
         }
-        .nav-btn:hover { background: rgba(255,255,255,0.3); scale: 1.1; }
+        .nav-btn:hover { background: rgba(255,255,255,0.3); }
         .btn-prev { left: 20px; }
         .btn-next { right: 20px; }
     </style>
@@ -78,7 +76,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Se puede encontrar en climas frescos y tiene una hojas particular en forma estrelladas."</p>
+                        <p class="italic">"Se puede encontrar en climas frescos..."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -96,7 +94,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Panorámica desde San Juancito, en Francisco Morazán."</p>
+                        <p class="italic">"Panorámica desde San Juancito..."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -114,7 +112,7 @@
                         <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"En Honduras podemos encontrar 7 especies de pino."</p>
+                        <p class="italic">"En Honduras podemos encontrar 7 especies..."</p>
                         <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                     </div>
                 </div>
@@ -126,8 +124,8 @@
     <div id="imageModal" onclick="closeModal(event)">
         <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 z-[110]" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
         
-        <button class="nav-btn btn-prev" onclick="navigateModal(-1, event)">❮</button>
-        <button class="nav-btn btn-next" onclick="navigateModal(1, event)">❯</button>
+        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
+        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
 
         <img id="fullImage" src="" onclick="event.stopPropagation()">
         
@@ -135,8 +133,8 @@
     </div>
 
     <script>
-        let currentModalImages = []; // Lista de URLs de imágenes visibles
-        let currentIndex = 0; // Índice de la imagen actual en el modal
+        let currentBlockImages = []; // Fotos del bloque actual
+        let currentBlockIdx = 0; // Índice dentro del bloque
 
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
@@ -151,15 +149,6 @@
                 opt.value = anio;
                 opt.textContent = anio;
                 selectAnio.appendChild(opt);
-            });
-
-            // Soporte teclado
-            window.addEventListener('keydown', (e) => {
-                if (document.getElementById('imageModal').style.display === 'flex') {
-                    if (e.key === "ArrowRight") navigateModal(1);
-                    if (e.key === "ArrowLeft") navigateModal(-1);
-                    if (e.key === "Escape") document.getElementById('imageModal').style.display = 'none';
-                }
             });
         });
 
@@ -181,6 +170,7 @@
             card.classList.toggle('flipped');
         }
 
+        // Slider de la tarjeta pequeña
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
@@ -192,35 +182,36 @@
             imgs[nextIdx].classList.add('active');
         }
 
-        // Abrir modal y capturar todas las imágenes visibles para navegar
+        // MODAL: Ahora se enfoca en el bloque (tarjeta) seleccionado
         function openModal(btn, e) {
-            if(e) e.stopPropagation();
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgsInBlock = container.querySelectorAll('.preview-img');
             
-            // Recopilar todas las imágenes de tarjetas NO ocultas por el filtro
-            const visibleCards = document.querySelectorAll('.photo-card:not(.hidden-card)');
-            currentModalImages = [];
+            // Guardamos todas las fotos de ESTE BLOQUE
+            currentBlockImages = Array.from(imgsInBlock).map(img => img.src);
             
-            visibleCards.forEach(card => {
-                // Tomamos la imagen que esté activa en el slider de esa tarjeta
-                const activeImg = card.querySelector('.preview-img.active');
-                if(activeImg) currentModalImages.push(activeImg.src);
-            });
+            // Buscamos cuál es la foto que estaba activa al hacer clic
+            const activeImg = container.querySelector('.preview-img.active');
+            currentBlockIdx = currentBlockImages.indexOf(activeImg.src);
 
-            const currentSrc = btn.closest('.img-container').querySelector('.preview-img.active').src;
-            currentIndex = currentModalImages.indexOf(currentSrc);
+            // Mostrar/Ocultar flechas del modal si solo hay una foto
+            const displayNav = currentBlockImages.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalPrev').style.display = displayNav;
+            document.getElementById('modalNext').style.display = displayNav;
 
             updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        function updateModalContent() {
-            document.getElementById('fullImage').src = currentModalImages[currentIndex];
+        function navigateBlockModal(step, e) {
+            if(e) e.stopPropagation();
+            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
+            updateModalContent();
         }
 
-        function navigateModal(step, e) {
-            if(e) e.stopPropagation();
-            currentIndex = (currentIndex + step + currentModalImages.length) % currentModalImages.length;
-            updateModalContent();
+        function updateModalContent() {
+            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
         }
 
         function closeModal(e) {
