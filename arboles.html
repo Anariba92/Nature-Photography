@@ -3,34 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería Pro con Donación</title>
+    <title>Galería por Álbumes con Donación</title>
     <style>
         :root {
             --primary: #2563eb;
+            --accent: #10b981;
             --dark: #1f2937;
             --light: #f3f4f6;
         }
 
-        body { font-family: sans-serif; margin: 0; background: var(--light); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--light); padding: 20px; }
         
-        /* Grid de la Galería */
-        .gallery {
+        /* Estructura de Álbumes */
+        .album-container { margin-bottom: 40px; }
+        .album-title { 
+            border-left: 5px solid var(--primary); 
+            padding-left: 15px; 
+            margin-bottom: 20px; 
+            color: var(--dark);
+        }
+
+        .grid-album {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
-            padding: 20px;
         }
 
-        .gallery img {
-            width: 100%;
-            height: 200px;
+        .grid-album img {
+            width: 100%; height: 150px;
             object-fit: cover;
+            border-radius: 10px;
             cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.2s;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .gallery img:hover { transform: scale(1.03); }
+        .grid-album img:hover { transform: translateY(-5px); }
 
         /* Visor Pantalla Completa */
         #viewer {
@@ -38,35 +46,25 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.98);
             z-index: 1000;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
 
-        #viewer img {
-            max-width: 90%;
-            max-height: 80%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
+        #viewer img { max-width: 90%; max-height: 75vh; border-radius: 5px; }
 
-        /* Controles del Visor */
-        .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
-        .nav-btn { position: absolute; top: 50%; color: white; font-size: 50px; cursor: pointer; padding: 20px; user-select: none; }
-        .prev { left: 10px; }
-        .next { right: 10px; }
+        /* Controles */
+        .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 45px; cursor: pointer; opacity: 0.7; }
+        .close-btn:hover { opacity: 1; }
+        
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 50px; cursor: pointer; padding: 20px; user-select: none; }
+        .prev { left: 5px; }
+        .next { right: 5px; }
 
-        .download-area { margin-top: 20px; }
-        .btn-main {
-            background: var(--primary);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+        .controls-footer { margin-top: 25px; text-align: center; }
+        .btn-dl { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; }
 
         /* Modal de Donación */
         #donation-modal {
@@ -74,75 +72,95 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             z-index: 1100;
             justify-content: center;
             align-items: center;
         }
 
-        .modal-content {
+        .modal-card {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        .modal-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .btn-donate { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .btn-skip { background: #9ca3af; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .modal-card h3 { margin-top: 0; color: var(--dark); }
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        
+        .btn-donate { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-skip { background: transparent; color: #666; border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="gallery" id="gallery">
-    <img src="https://picsum.photos/id/10/800/600" alt="Imagen 1">
-    <img src="https://picsum.photos/id/20/800/600" alt="Imagen 2">
-    <img src="https://picsum.photos/id/30/800/600" alt="Imagen 3">
-    <img src="https://picsum.photos/id/40/800/600" alt="Imagen 4">
+<div class="album-container" data-album-id="naturaleza">
+    <h2 class="album-title">Fotografía de Naturaleza</h2>
+    <div class="grid-album">
+        <img src="https://picsum.photos/id/10/1200/800" alt="Bosque">
+        <img src="https://picsum.photos/id/11/1200/800" alt="Río">
+        <img src="https://picsum.photos/id/12/1200/800" alt="Playa">
+    </div>
+</div>
+
+<div class="album-container" data-album-id="arquitectura">
+    <h2 class="album-title">Arquitectura Moderna</h2>
+    <div class="grid-album">
+        <img src="https://picsum.photos/id/1011/1200/800" alt="Edificio A">
+        <img src="https://picsum.photos/id/1031/1200/800" alt="Edificio B">
+        <img src="https://picsum.photos/id/1040/1200/800" alt="Castillo">
+        <img src="https://picsum.photos/id/1043/1200/800" alt="Muralla">
+    </div>
 </div>
 
 <div id="viewer">
     <span class="close-btn" onclick="closeViewer()">&times;</span>
-    <span class="nav-btn prev" onclick="changeImage(-1)">&#10094;</span>
+    <span class="nav-btn prev" onclick="navigate(-1)">&#10094;</span>
     <img id="full-img" src="">
-    <span class="nav-btn next" onclick="changeImage(1)">&#10095;</span>
+    <span class="nav-btn next" onclick="navigate(1)">&#10095;</span>
     
-    <div class="download-area">
-        <button class="btn-main" onclick="showDonationModal()">Descargar Imagen</button>
+    <div class="controls-footer">
+        <button class="btn-dl" onclick="showDonation()">Descargar Imagen</button>
     </div>
 </div>
 
 <div id="donation-modal">
-    <div class="modal-content">
-        <h3>¿Quieres apoyar al autor?</h3>
-        <p>Tu descarga está lista. ¿Te gustaría realizar una pequeña donación antes de bajar el archivo?</p>
-        <div class="modal-btns">
-            <button class="btn-donate" onclick="processAction('donar')">Sí, donar</button>
-            <button class="btn-skip" onclick="processAction('descargar')">No, solo descargar</button>
+    <div class="modal-card">
+        <h3>¡Tu imagen está lista!</h3>
+        <p>¿Te gustaría apoyar nuestro trabajo con una donación antes de descargar?</p>
+        <div class="modal-actions">
+            <button class="btn-donate" onclick="handleAction('donar')">💖 Sí, quiero donar</button>
+            <button class="btn-skip" onclick="handleAction('descargar')">No, solo descargar</button>
         </div>
     </div>
 </div>
 
 <script>
-    const images = Array.from(document.querySelectorAll('.gallery img'));
+    let currentAlbumImages = [];
+    let currentIndex = 0;
     const viewer = document.getElementById('viewer');
     const fullImg = document.getElementById('full-img');
     const donationModal = document.getElementById('donation-modal');
-    let currentIndex = 0;
 
-    // Abrir visor
-    images.forEach((img, index) => {
-        img.onclick = () => {
-            currentIndex = index;
-            openViewer(img.src);
-        };
+    // Inicializar clics por álbum
+    document.querySelectorAll('.album-container').forEach(album => {
+        const imgs = Array.from(album.querySelectorAll('img'));
+        
+        imgs.forEach((img, index) => {
+            img.onclick = () => {
+                currentAlbumImages = imgs; // Guardamos solo las fotos de ESTE álbum
+                currentIndex = index;
+                openViewer();
+            };
+        });
     });
 
-    function openViewer(src) {
-        fullImg.src = src;
+    function openViewer() {
+        fullImg.src = currentAlbumImages[currentIndex].src;
         viewer.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // Bloquear scroll
+        document.body.style.overflow = 'hidden';
     }
 
     function closeViewer() {
@@ -150,44 +168,40 @@
         document.body.style.overflow = 'auto';
     }
 
-    function changeImage(dir) {
+    function navigate(dir) {
         currentIndex += dir;
-        if (currentIndex < 0) currentIndex = images.length - 1;
-        if (currentIndex >= images.length) currentIndex = 0;
-        fullImg.src = images[currentIndex].src;
+        if (currentIndex < 0) currentIndex = currentAlbumImages.length - 1;
+        if (currentIndex >= currentAlbumImages.length) currentIndex = 0;
+        fullImg.src = currentAlbumImages[currentIndex].src;
     }
 
-    // Lógica de Descarga y Donación
-    function showDonationModal() {
+    function showDonation() {
         donationModal.style.display = 'flex';
     }
 
-    function processAction(action) {
+    function handleAction(type) {
         donationModal.style.display = 'none';
-        
-        if (action === 'donar') {
-            alert("Redirigiendo a pasarela de pago...");
-            // Aquí iría tu link de PayPal/Stripe
+        if(type === 'donar') {
+            window.open('https://paypal.me/tu-usuario', '_blank'); // Cambia por tu link real
         }
-        
-        // Iniciar descarga en ambos casos (o solo en 'descargar' si prefieres)
-        triggerDownload(fullImg.src);
+        triggerDownload();
     }
 
-    function triggerDownload(url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `imagen-${currentIndex + 1}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+    function triggerDownload() {
+        const link = document.createElement('a');
+        link.href = fullImg.src;
+        link.download = `foto-album-${currentIndex + 1}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
-    // Cerrar con Escape
+    // Teclas rápidas
     window.onkeydown = (e) => {
-        if (e.key === "Escape") {
-            closeViewer();
-            donationModal.style.display = 'none';
+        if (viewer.style.display === 'flex') {
+            if (e.key === "ArrowLeft") navigate(-1);
+            if (e.key === "ArrowRight") navigate(1);
+            if (e.key === "Escape") closeViewer();
         }
     };
 </script>
