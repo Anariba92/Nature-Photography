@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Contenedor con efecto ventana */
+        /* CONTENEDOR: Actúa como un marco de cuadro */
         .img-container { 
             height: 380px; 
             overflow: hidden; 
@@ -16,51 +16,55 @@
             border-radius: 1rem 1rem 0 0; 
         }
         
-        /* Imagen en el preview: Solo muestra una parte central */
+        /* PREVIEW: Aquí forzamos el ZOOM para que solo se vea el centro */
         .preview-img { 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
-            object-position: center; 
             position: absolute; 
-            transition: all 0.5s ease; 
+            transition: transform 0.5s ease, opacity 0.5s ease; 
             z-index: 0; 
             opacity: 0; 
-            /* Zoom para que solo se vea una parte de la foto original */
-            transform: scale(1.5); 
+            /* Forzamos escala 1.8 para que se vea "una parte" de la foto */
+            transform: scale(1.8); 
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* Efecto 3D de la tarjeta */
-        .photo-card { perspective: 1000px; height: 480px; transition: all 0.3s ease; }
+        /* TARJETA 3D */
+        .photo-card { perspective: 1000px; height: 480px; }
         .inner-card { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; }
+        .back-card { transform: rotateY(180deg); background: #064e3b; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
         
-        .back-card { 
-            transform: rotateY(180deg); background: #064e3b; color: white; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
+        /* MODAL: Aquí la foto debe verse COMPLETA */
+        #imageModal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 9999; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
         }
         
-        /* Modal para ver la foto completa */
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; overflow: auto; padding: 20px; }
-        
-        /* Foto Completa en el modal */
         #fullImage { 
-            max-width: 90%; 
-            max-height: 80vh; 
-            object-fit: contain; /* Aquí se asegura que se vea completa */
+            max-width: 95%; 
+            max-height: 70vh; 
+            /* 'contain' obliga a que se muestre toda la imagen sin recortar */
+            object-fit: contain; 
             border-radius: 0.5rem; 
             transition: transform 0.3s ease; 
-            cursor: zoom-in; 
+            cursor: zoom-in;
+            /* Reseteamos cualquier transform del preview */
+            transform: scale(1) !important; 
         }
         
-        /* Opción de Ampliar aún más (Zoom) */
-        #fullImage.zoomed { transform: scale(1.8); cursor: zoom-out; }
+        #fullImage.zoomed { transform: scale(1.5) !important; cursor: zoom-out; }
         
         .hidden-card { display: none !important; }
-
-        #filterCount { transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
+        #filterCount { transition: opacity 0.3s ease; opacity: 0; }
         #filterCount.show { opacity: 1; }
 
         body { padding-top: 12rem; }
@@ -72,18 +76,12 @@
     <nav class="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-xl border-b z-[100] p-4">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all shadow-md">
-                    ❮ MENÚ
-                </a>
-                <div id="filterCount" class="text-xs font-bold text-stone-500 bg-stone-200 px-3 py-1 rounded-full uppercase tracking-tighter">
-                    Actualizando...
-                </div>
+                <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm shadow-md">❮ MENÚ</a>
+                <div id="filterCount" class="text-xs font-bold text-stone-500 bg-stone-200 px-3 py-1 rounded-full uppercase">Actualizando...</div>
             </div>
-            
             <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar especie o lugar..." 
-                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600 shadow-sm transition-all">
-                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none shadow-sm cursor-pointer hover:border-green-600">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar..." class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white">
                     <option value="all">Todos los años</option>
                 </select>
             </div>
@@ -91,165 +89,98 @@
     </nav>
 
     <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
+        <div class="photo-card" data-name="liquidambar" data-year="2026">
             <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card bg-white">
+                    <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img active">
-                            <img src="img/hoja.jpg" class="preview-img">
-                            <button onclick="changeSlide(this, -1, event)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-2.5 rounded-full z-20 shadow-lg hover:scale-110">🔍</button>
+                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-20 shadow-xl hover:scale-110 transition-transform">🔍 Ver Completa</button>
                         </div>
                         <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">Liquidámbar</h3>
+                            <h3 class="font-bold text-green-900 uppercase text-sm">Liquidámbar</h3>
                         </div>
                     </div>
                     <div class="back-card">
-                        <p class="italic text-lg">"El liquidámbar es un árbol de zonas frescas que se caracteriza por la forma de su hoja."</p>
-                        <div class="mt-6 pt-4 border-t border-white/20 w-full text-xs opacity-60">Foto publicada: 2026</div>
+                        <p class="italic text-lg">"Hojas en forma de estrella."</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
+        <div class="photo-card" data-name="san juancito" data-year="2026">
             <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card bg-white">
+                    <div class="front-card bg-white shadow-lg">
                         <div class="img-container">
                             <img src="img/montaña.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-2.5 rounded-full z-20 shadow-lg hover:scale-110">🔍</button>
+                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-20 shadow-xl hover:scale-110 transition-transform">🔍 Ver Completa</button>
                         </div>
                         <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">San Juancito</h3>
+                            <h3 class="font-bold text-green-900 uppercase text-sm">San Juancito</h3>
                         </div>
                     </div>
                     <div class="back-card">
-                        <p class="italic text-lg">"Panorámica tomada desde las alturas de San Juancito."</p>
-                        <div class="mt-6 pt-4 border-t border-white/20 w-full text-xs opacity-60">Foto publicada: 2026</div>
+                        <p class="italic text-lg">"Paisaje de montaña."</p>
                     </div>
                 </div>
             </div>
         </div>
-
     </main>
 
     <div id="imageModal" onclick="closeModal()">
-        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 z-50">&times;</span>
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer">&times;</span>
         <div class="flex flex-col items-center">
-            <p class="text-white text-xs mb-4 opacity-70">Vista Completa - Haz clic para ampliar</p>
-            <img id="fullImage" src="" class="shadow-2xl border-4 border-white/10" onclick="toggleZoom(event)">
-            <button onclick="askDonation(event)" class="mt-8 bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all">📥 Descargar Fotografía</button>
+            <img id="fullImage" src="" onclick="toggleZoom(event)">
+            <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-8 py-3 rounded-full font-bold">Descargar</button>
         </div>
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const tarjetas = document.querySelectorAll('.photo-card');
-            const selectAnio = document.getElementById('yearFilter');
-            const listaAnios = new Set();
-
-            tarjetas.forEach(t => {
-                const anio = t.getAttribute('data-year');
-                if(anio) listaAnios.add(anio);
-                const imgs = t.querySelectorAll('.preview-img');
-                if (imgs.length <= 1) {
-                    t.querySelectorAll('.img-container button:not(:last-child)').forEach(b => b.style.display = 'none');
-                }
-            });
-
-            Array.from(listaAnios).sort().reverse().forEach(anio => {
-                const opt = new Option(anio, anio);
-                selectAnio.add(opt);
-            });
-        });
-
+        // Lógica de Filtros y Contador
         function filtrarContenido() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const anioFiltro = document.getElementById('yearFilter').value;
             const tarjetas = document.querySelectorAll('.photo-card');
             const contador = document.getElementById('filterCount');
 
-            if (input !== "" || anioFiltro !== "all") {
-                contador.classList.add('show');
-            } else {
-                contador.classList.remove('show');
-            }
+            contador.classList.toggle('show', (input !== "" || anioFiltro !== "all"));
 
             tarjetas.forEach(t => {
-                const nombre = (t.getAttribute('data-name') || "").toLowerCase();
-                const anio = t.getAttribute('data-year') || "";
-                const coincideBusqueda = nombre.includes(input);
-                const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
-                t.classList.toggle('hidden-card', !(coincideBusqueda && coincideAnio));
+                const nombre = t.getAttribute('data-name').toLowerCase();
+                const anio = t.getAttribute('data-year');
+                const coincide = nombre.includes(input) && (anioFiltro === 'all' || anio === anioFiltro);
+                t.classList.toggle('hidden-card', !coincide);
             });
-            actualizarContador();
-        }
-
-        function actualizarContador() {
-            const total = document.querySelectorAll('.photo-card').length;
-            const visibles = document.querySelectorAll('.photo-card:not(.hidden-card)').length;
-            document.getElementById('filterCount').textContent = `Resultados: ${visibles} de ${total}`;
+            document.getElementById('filterCount').textContent = `Encontradas: ${document.querySelectorAll('.photo-card:not(.hidden-card)').length}`;
         }
 
         function handleFlip(card, e) {
-            // Si hace clic en la lupa, no gira la tarjeta, solo abre el modal
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
 
-        function changeSlide(btn, step, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            imgs[idx].classList.remove('active');
-            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
-        }
-
+        // Abrir Modal y Limpiar Zoom
         function openModal(btn, e) {
             e.stopPropagation();
-            const activa = btn.closest('.img-container').querySelector('.preview-img.active');
-            const fullImg = document.getElementById('fullImage');
-            fullImg.src = activa.src;
-            fullImg.classList.remove('zoomed'); // Reset zoom
+            const imgPath = btn.closest('.img-container').querySelector('.preview-img').src;
+            const modalImg = document.getElementById('fullImage');
+            modalImg.src = imgPath;
+            modalImg.classList.remove('zoomed');
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-
+        function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
+        
         function toggleZoom(e) {
             e.stopPropagation();
             e.target.classList.toggle('zoomed');
         }
 
+        // Donación (Simulado)
         function askDonation(e) {
             e.stopPropagation();
-            const imgUrl = document.getElementById('fullImage').src;
-            Swal.fire({
-                title: '¿Deseas apoyar el proyecto?',
-                text: "Tu donación voluntaria ayuda a proteger nuestros bosques.",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Donar y Descargar',
-                cancelButtonText: 'Descargar Gratis',
-                confirmButtonColor: '#16a34a',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.open('TU_LINK_DE_PAYPAL', '_blank');
-                }
-                const link = document.createElement('a');
-                link.href = imgUrl;
-                link.download = 'Bosque_Honduras.jpg';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
+            Swal.fire('¡Gracias!', 'Iniciando descarga...', 'success');
         }
     </script>
 </body>
