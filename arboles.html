@@ -24,11 +24,13 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
         
-        /* Modal Mejorado */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; cursor: default; }
         
         .hidden-card { display: none !important; }
+
+        /* Ajuste para que SweetAlert no se vea pequeño dentro del modal */
+        .swal2-container { z-index: 10000 !important; }
     </style>
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
@@ -117,17 +119,14 @@
     </div>
 
     <script>
-        // 1. CARGA INICIAL
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
             const listaAnios = new Set();
-
             tarjetas.forEach(t => {
                 const anio = t.getAttribute('data-year');
                 if(anio) listaAnios.add(anio);
             });
-
             Array.from(listaAnios).sort().reverse().forEach(anio => {
                 const opt = document.createElement('option');
                 opt.value = anio;
@@ -136,39 +135,31 @@
             });
         });
 
-        // 2. FILTRADO
         function filtrarContenido() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const anioFiltro = document.getElementById('yearFilter').value;
             const tarjetas = document.querySelectorAll('.photo-card');
-
             tarjetas.forEach(tarjeta => {
                 const nombre = (tarjeta.getAttribute('data-name') || "").toLowerCase();
                 const anio = tarjeta.getAttribute('data-year') || "";
                 const coincideTexto = nombre.includes(input);
                 const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
-
                 tarjeta.classList.toggle('hidden-card', !(coincideTexto && coincideAnio));
             });
         }
 
-        // 3. INTERACCIONES
         function handleFlip(card, e) {
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
 
-        // Mejora: Navegación circular robusta
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
             if (imgs.length <= 1) return;
-
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[activeIdx].classList.remove('active');
-            
-            // Fórmula circular para manejar negativos y positivos
             let nextIdx = (activeIdx + step + imgs.length) % imgs.length;
             imgs[nextIdx].classList.add('active');
         }
@@ -181,7 +172,6 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        // Mejora: Evita cierre accidental al tocar la imagen o botón
         function closeModal(e) {
             if (e.target.id === 'imageModal') {
                 document.getElementById('imageModal').style.display = 'none';
@@ -190,10 +180,12 @@
 
         function askDonation(e) {
             e.stopPropagation();
+            // LA CLAVE: Usamos 'target' para que el mensaje se renderice dentro del modal
             Swal.fire({
                 title: '¿Quieres descargar la foto?',
                 text: "Puedes apoyarnos con una donación o descargar gratis.",
                 icon: 'question',
+                target: document.getElementById('imageModal'), // Esto lo pone al frente
                 showCancelButton: true,
                 confirmButtonColor: '#059669',
                 cancelButtonColor: '#6b7280',
