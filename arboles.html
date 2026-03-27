@@ -13,20 +13,45 @@
             position: absolute; transition: opacity 0.5s ease; 
             z-index: 0; opacity: 0; 
         }
-        /* Esta clase es la que faltaba en el bloque de en medio */
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        .photo-card { perspective: 1000px; height: 460px; transition: transform 0.3s; }
-        .inner-card { transition: transform 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
+        /* PERSPECTIVA Y GIRO */
+        .photo-card { perspective: 1000px; height: 460px; }
+        .inner-card { 
+            transition: transform 0.8s; 
+            transform-style: preserve-3d; 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            cursor: pointer;
+        }
+        
+        /* Esta es la clase que hace el giro */
         .flipped .inner-card { transform: rotateY(180deg); }
-        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; }
+        
+        .front-card, .back-card { 
+            backface-visibility: hidden; 
+            position: absolute; 
+            inset: 0; 
+            border-radius: 1rem; 
+            overflow: hidden; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
         .back-card { 
-            transform: rotateY(180deg); background: #064e3b; color: white; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
+            transform: rotateY(180deg); 
+            background: #064e3b; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 2rem; 
+            text-align: center; 
         }
         
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; cursor: default; }
+        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; }
         
         .hidden-card { display: none !important; }
         .swal2-container { z-index: 10000 !important; }
@@ -41,15 +66,16 @@
         .btn-next { right: 15px; }
 
         @media (max-width: 768px) {
-            .nav-btn { width: 50px; height: 50px; background: rgba(0,0,0,0.5); }
-            .img-container { height: 320px; }
-            .photo-card { height: 420px; }
+            .nav-btn { width: 45px; height: 45px; background: rgba(0,0,0,0.5); }
+            .img-container { height: 300px; }
+            .photo-card { height: 400px; }
+            body { padding-top: 220px; }
         }
     </style>
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
 
-    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4">
+    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4 shadow-sm">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
             <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all">
                 ❮ MENÚ
@@ -67,47 +93,165 @@
     <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
         <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="img/Pino.jpg" class="preview-img active" loading="lazy">
-                            <img src="img/hoja.jpg" class="preview-img" loading="lazy">
-                            <img src="img/bosque.jpg" class="preview-img" loading="lazy">
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20 hover:bg-black/50">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+            <div class="inner-card" onclick="handleFlip(this, event)">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/Pino.jpg" class="preview-img active" loading="lazy">
+                        <img src="img/hoja.jpg" class="preview-img" loading="lazy">
+                        <img src="img/bosque.jpg" class="preview-img" loading="lazy">
+                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20 hover:bg-black/50">❯</button>
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
-                    <div class="back-card">
-                        <p class="italic text-lg">"Se puede encontrar en climas frescos..."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"Se puede encontrar en climas frescos de las montañas."</p>
+                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
 
         <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="img/montaña.jpg" class="preview-img active" loading="lazy">
-                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
-                        </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
+            <div class="inner-card" onclick="handleFlip(this, event)">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/montaña.jpg" class="preview-img active" loading="lazy">
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
-                    <div class="back-card">
-                        <p class="italic text-lg">"Panorámica desde San Juancito..."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"Panorámica desde las alturas de la mina."</p>
+                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
 
         <div class="photo-card" data-name="pino ocote pinabete bosque" data-year="2026">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container">
-                            <img src="
+            <div class="inner-card" onclick="handleFlip(this, event)">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/bosque.jpg" class="preview-img active" loading="lazy">
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"En Honduras podemos encontrar 7 especies de pinos."</p>
+                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <div id="imageModal" onclick="closeModal(event)">
+        <span class="absolute top-5 right-6 text-white text-6xl cursor-pointer hover:text-green-400 z-[110]" onclick="closeModal(event)">&times;</span>
+        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
+        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-10 py-4 rounded-full font-bold hover:bg-green-500 transition-colors z-[110] shadow-xl">Descargar Foto</button>
+    </div>
+
+    <script>
+        let currentBlockImages = [];
+        let currentBlockIdx = 0;
+
+        // Cargar años
+        window.addEventListener('DOMContentLoaded', () => {
+            const tarjetas = document.querySelectorAll('.photo-card');
+            const selectAnio = document.getElementById('yearFilter');
+            const listaAnios = new Set();
+            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
+            Array.from(listaAnios).sort().reverse().forEach(anio => {
+                if(anio) selectAnio.add(new Option(anio, anio));
+            });
+        });
+
+        // FILTRADO
+        function filtrarContenido() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(card => {
+                const matchText = card.dataset.name.toLowerCase().includes(query);
+                const matchYear = year === 'all' || card.dataset.year === year;
+                card.classList.toggle('hidden-card', !(matchText && matchYear));
+            });
+        }
+
+        // GIRO DE CARTA (CORREGIDO)
+        function handleFlip(innerCard, e) {
+            // Evita girar si haces clic en los botones
+            if (e.target.closest('button')) return;
+            
+            // Buscamos el contenedor padre .photo-card y le ponemos la clase .flipped
+            const parentCard = innerCard.closest('.photo-card');
+            parentCard.classList.toggle('flipped');
+        }
+
+        // SLIDER INTERNO
+        function changeSlide(btn, step, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[idx].classList.remove('active');
+            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
+        }
+
+        // MODAL
+        function openModal(btn, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            currentBlockImages = Array.from(imgs).map(img => img.src);
+            currentBlockIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            
+            document.getElementById('modalPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalNext').style.display = imgs.length > 1 ? 'flex' : 'none';
+            
+            updateModal();
+            document.getElementById('imageModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function navigateBlockModal(step, e) {
+            e.stopPropagation();
+            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
+            updateModal();
+        }
+
+        function updateModal() {
+            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'imageModal' || e.target.innerText === '×') {
+                document.getElementById('imageModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: '¿Descargar imagen?',
+                text: "Tu apoyo ayuda a conservar los bosques de Honduras.",
+                icon: 'info',
+                target: document.getElementById('imageModal'),
+                showCancelButton: true,
+                confirmButtonText: 'Donar y bajar',
+                cancelButtonText: 'Bajar gratis',
+                confirmButtonColor: '#059669'
+            }).then((res) => {
+                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
+                    const a = document.createElement('a');
+                    a.href = document.getElementById('fullImage').src;
+                    a.download = 'bosque-honduras.jpg';
+                    a.click();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
