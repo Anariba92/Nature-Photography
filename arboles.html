@@ -233,3 +233,59 @@
             currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
             updateModal();
         }
+
+        function updateModal() {
+            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'imageModal' || e.target.innerText === '×') {
+                document.getElementById('imageModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function filtrarContenido() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(card => {
+                const matchText = card.dataset.name.toLowerCase().includes(query);
+                const matchYear = year === 'all' || card.dataset.year === year;
+                card.classList.toggle('hidden-card', !(matchText && matchYear));
+            });
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: '¿Descargar imagen?',
+                text: "Tu apoyo ayuda a conservar los bosques de Honduras.",
+                icon: 'info',
+                target: document.getElementById('imageModal'),
+                showCancelButton: true,
+                confirmButtonText: 'Donar y bajar',
+                cancelButtonText: 'Bajar gratis',
+                confirmButtonColor: '#059669'
+            }).then((res) => {
+                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
+                    const a = document.createElement('a');
+                    a.href = document.getElementById('fullImage').src;
+                    a.download = 'bosque-honduras.jpg';
+                    a.click();
+                }
+            });
+        }
+
+        // Inicializar años
+        window.addEventListener('DOMContentLoaded', () => {
+            const tarjetas = document.querySelectorAll('.photo-card');
+            const selectAnio = document.getElementById('yearFilter');
+            const listaAnios = new Set();
+            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
+            Array.from(listaAnios).sort().reverse().forEach(anio => {
+                if(anio) selectAnio.add(new Option(anio, anio));
+            });
+        });
+    </script>
+</body>
+</html>
