@@ -7,55 +7,68 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Ajuste para que el cuerpo no se mueva al abrir modal */
         body.modal-open { overflow: hidden; }
 
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         .preview-img { 
             width: 100%; height: 100%; object-fit: cover; object-position: center; 
             position: absolute; transition: opacity 0.5s ease; 
-            z-index: 0; opacity: 0; 
+            z-index: 1; opacity: 0; 
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* PERSPECTIVA Y GIRO MEJORADO PARA MÓVIL */
-        .photo-card { perspective: 1200px; height: 460px; -webkit-perspective: 1200px; }
+        .photo-card { perspective: 1200px; height: 460px; }
         .inner-card { 
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             transform-style: preserve-3d; 
-            -webkit-transform-style: preserve-3d;
             position: relative; 
             width: 100%; height: 100%; cursor: pointer;
         }
         
-        /* Clase de giro */
-        .flipped .inner-card { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
+        .flipped .inner-card { transform: rotateY(180deg); }
         
         .front-card, .back-card { 
             backface-visibility: hidden; 
-            -webkit-backface-visibility: hidden;
             position: absolute; inset: 0; 
             border-radius: 1rem; overflow: hidden; 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
-        /* Asegurar que la cara trasera esté lista para mostrarse */
         .back-card { 
             transform: rotateY(180deg); 
-            -webkit-transform: rotateY(180deg);
             background: #064e3b; color: white; 
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             padding: 2rem; text-align: center;
-            z-index: 1;
         }
 
-        .front-card { z-index: 2; }
+        /* --- ESTILO DE FLECHAS EN TARJETAS --- */
+        .nav-arrow {
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5); 
+            color: white; 
+            border-radius: 50%;
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            z-index: 50; 
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .nav-arrow:hover { background: rgba(0, 0, 0, 0.8); }
+        .arrow-left { left: 10px; }
+        .arrow-right { right: 10px; }
         
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 70vh; object-fit: contain; border-radius: 0.5rem; }
         .hidden-card { display: none !important; }
 
+        /* Botones Modal */
         .nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
@@ -97,8 +110,10 @@
                 <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/mariposa1.jpg" class="preview-img active" loading="lazy">
-                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20">❯</button>
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
+                        
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Mariposa Malaquita</div>
                 </div>
@@ -115,8 +130,11 @@
                     <div class="img-container">
                         <img src="img/chinche.jpg" class="preview-img active" loading="lazy">
                         <img src="img/chinche1.jpg" class="preview-img" loading="lazy">
-                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20">❯</button>
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                        
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
+                        
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Chinche</div>
                 </div>
@@ -132,8 +150,11 @@
                 <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/mariquita.jpg" class="preview-img active" loading="lazy">
-                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20">❯</button>
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                        
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
+                        
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Escarabajo Pulga</div>
                 </div>
@@ -170,8 +191,9 @@
             // Ocultar flechas si hay solo 1 imagen
             document.querySelectorAll('.img-container').forEach(container => {
                 const fotos = container.querySelectorAll('.preview-img');
-                const botonFlecha = container.querySelector('button[onclick*="changeSlide"]');
-                if (fotos.length <= 1 && botonFlecha) botonFlecha.remove();
+                if (fotos.length <= 1) {
+                    container.querySelectorAll('.nav-arrow').forEach(btn => btn.style.display = 'none');
+                }
             });
         });
 
@@ -185,18 +207,10 @@
             });
         }
 
-        // Manejo de giro mejorado para móvil
         function handleFlip(innerCard, e) {
-            // Si el clic es en un botón (lupa o flecha), no girar
             if (e.target.closest('button')) return;
-            
             const parentCard = innerCard.closest('.photo-card');
-            // Alternamos la clase flipped
-            if (parentCard.classList.contains('flipped')) {
-                parentCard.classList.remove('flipped');
-            } else {
-                parentCard.classList.add('flipped');
-            }
+            parentCard.classList.toggle('flipped');
         }
 
         function changeSlide(btn, step, e) {
@@ -204,9 +218,11 @@
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
             if (imgs.length <= 1) return;
+            
             let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[idx].classList.remove('active');
-            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
+            let nextIdx = (idx + step + imgs.length) % imgs.length;
+            imgs[nextIdx].classList.add('active');
         }
 
         function openModal(btn, e) {
