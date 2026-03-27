@@ -7,35 +7,59 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
+        /* Contenedor con efecto ventana */
+        .img-container { 
+            height: 380px; 
+            overflow: hidden; 
+            position: relative; 
+            background: #1a1a1a; 
+            border-radius: 1rem 1rem 0 0; 
+        }
         
+        /* Imagen en el preview: Solo muestra una parte central */
         .preview-img { 
-            width: 100%; height: 100%; object-fit: cover; object-position: center; 
-            position: absolute; transition: all 0.5s ease; 
-            z-index: 0; opacity: 0; transform: scale(1.2); 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: center; 
+            position: absolute; 
+            transition: all 0.5s ease; 
+            z-index: 0; 
+            opacity: 0; 
+            /* Zoom para que solo se vea una parte de la foto original */
+            transform: scale(1.5); 
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
+        /* Efecto 3D de la tarjeta */
         .photo-card { perspective: 1000px; height: 480px; transition: all 0.3s ease; }
         .inner-card { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
         .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
         .back-card { 
             transform: rotateY(180deg); background: #064e3b; color: white; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
         
+        /* Modal para ver la foto completa */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; overflow: auto; padding: 20px; }
         
+        /* Foto Completa en el modal */
         #fullImage { 
-            max-width: 90%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; 
-            transition: transform 0.3s ease; cursor: zoom-in; 
+            max-width: 90%; 
+            max-height: 80vh; 
+            object-fit: contain; /* Aquí se asegura que se vea completa */
+            border-radius: 0.5rem; 
+            transition: transform 0.3s ease; 
+            cursor: zoom-in; 
         }
-        #fullImage.zoomed { transform: scale(1.5); cursor: zoom-out; max-height: none; max-width: 95%; }
+        
+        /* Opción de Ampliar aún más (Zoom) */
+        #fullImage.zoomed { transform: scale(1.8); cursor: zoom-out; }
         
         .hidden-card { display: none !important; }
 
-        /* Estilo para el contador oculto inicialmente */
         #filterCount { transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
         #filterCount.show { opacity: 1; }
 
@@ -75,13 +99,13 @@
                         <div class="img-container">
                             <img src="img/Pino.jpg" class="preview-img active">
                             <img src="img/hoja.jpg" class="preview-img">
-                            <button onclick="changeSlide(this, -1, event)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600 transition-colors">❮</button>
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600 transition-colors">❯</button>
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-2.5 rounded-full z-20 shadow-lg hover:scale-110 transition-transform">🔍</button>
+                            <button onclick="changeSlide(this, -1, event)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full z-20 hover:bg-green-600">❯</button>
+                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-2.5 rounded-full z-20 shadow-lg hover:scale-110">🔍</button>
                         </div>
                         <div class="p-5 text-center">
                             <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">Liquidámbar</h3>
-                            </div>
+                        </div>
                     </div>
                     <div class="back-card">
                         <p class="italic text-lg">"El liquidámbar es un árbol de zonas frescas que se caracteriza por la forma de su hoja."</p>
@@ -101,7 +125,7 @@
                         </div>
                         <div class="p-5 text-center">
                             <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">San Juancito</h3>
-                            </div>
+                        </div>
                     </div>
                     <div class="back-card">
                         <p class="italic text-lg">"Panorámica tomada desde las alturas de San Juancito."</p>
@@ -114,11 +138,11 @@
     </main>
 
     <div id="imageModal" onclick="closeModal()">
-        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 transition-colors z-50">&times;</span>
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 z-50">&times;</span>
         <div class="flex flex-col items-center">
-            <p class="text-white text-xs mb-4 opacity-70">Haz clic en la imagen para ampliar/reducir</p>
+            <p class="text-white text-xs mb-4 opacity-70">Vista Completa - Haz clic para ampliar</p>
             <img id="fullImage" src="" class="shadow-2xl border-4 border-white/10" onclick="toggleZoom(event)">
-            <button onclick="askDonation(event)" class="mt-8 bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all active:scale-95">📥 Descargar Fotografía</button>
+            <button onclick="askDonation(event)" class="mt-8 bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all">📥 Descargar Fotografía</button>
         </div>
     </div>
 
@@ -149,7 +173,6 @@
             const tarjetas = document.querySelectorAll('.photo-card');
             const contador = document.getElementById('filterCount');
 
-            // Mostrar el contador solo si hay actividad en los filtros
             if (input !== "" || anioFiltro !== "all") {
                 contador.classList.add('show');
             } else {
@@ -163,7 +186,6 @@
                 const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
                 t.classList.toggle('hidden-card', !(coincideBusqueda && coincideAnio));
             });
-            
             actualizarContador();
         }
 
@@ -174,6 +196,7 @@
         }
 
         function handleFlip(card, e) {
+            // Si hace clic en la lupa, no gira la tarjeta, solo abre el modal
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
@@ -192,7 +215,7 @@
             const activa = btn.closest('.img-container').querySelector('.preview-img.active');
             const fullImg = document.getElementById('fullImage');
             fullImg.src = activa.src;
-            fullImg.classList.remove('zoomed');
+            fullImg.classList.remove('zoomed'); // Reset zoom
             document.getElementById('imageModal').style.display = 'flex';
         }
 
