@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +26,6 @@
             cursor: pointer;
         }
         
-        /* Esta es la clase que hace el giro */
         .flipped .inner-card { transform: rotateY(180deg); }
         
         .front-card, .back-card { 
@@ -54,6 +54,15 @@
         
         .hidden-card { display: none !important; }
         .swal2-container { z-index: 10000 !important; }
+
+        /* Estilo general para flechas de navegación */
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.3); color: white; border-radius: 50%;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; z-index: 25;
+        }
+        .nav-arrow:hover { background: rgba(0,0,0,0.6); }
 
         .nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
@@ -98,7 +107,10 @@
                         <img src="img/Pino.jpg" class="preview-img active" loading="lazy">
                         <img src="img/hoja.jpg" class="preview-img" loading="lazy">
                         <img src="img/tronco.jpg" class="preview-img" loading="lazy">
-                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20 hover:bg-black/50">❯</button>
+                        
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
+                        
                         <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
@@ -115,7 +127,8 @@
                 <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/montaña.jpg" class="preview-img active" loading="lazy">
-                        
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
                         <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
@@ -132,7 +145,11 @@
                 <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/bosque.jpg" class="preview-img active" loading="lazy">
-                          <img src="img/bellota.jpg" class="preview-img" loading="lazy">
+                        <img src="img/bellota.jpg" class="preview-img" loading="lazy">
+                        
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
+                        
                         <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
@@ -158,7 +175,6 @@
         let currentBlockImages = [];
         let currentBlockIdx = 0;
 
-        // Cargar años
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
@@ -167,9 +183,16 @@
             Array.from(listaAnios).sort().reverse().forEach(anio => {
                 if(anio) selectAnio.add(new Option(anio, anio));
             });
+
+            // Ocultar flechas si la tarjeta solo tiene una imagen
+            document.querySelectorAll('.img-container').forEach(container => {
+                const totalImgs = container.querySelectorAll('.preview-img').length;
+                if (totalImgs <= 1) {
+                    container.querySelectorAll('.nav-arrow').forEach(btn => btn.style.display = 'none');
+                }
+            });
         });
 
-        // FILTRADO
         function filtrarContenido() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const year = document.getElementById('yearFilter').value;
@@ -180,27 +203,25 @@
             });
         }
 
-        // GIRO DE CARTA (CORREGIDO)
         function handleFlip(innerCard, e) {
-            // Evita girar si haces clic en los botones
             if (e.target.closest('button')) return;
-            
-            // Buscamos el contenedor padre .photo-card y le ponemos la clase .flipped
             const parentCard = innerCard.closest('.photo-card');
             parentCard.classList.toggle('flipped');
         }
 
-        // SLIDER INTERNO
+        // SLIDER INTERNO MEJORADO (Anterior y Siguiente)
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
             let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            
             imgs[idx].classList.remove('active');
-            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
+            // Cálculo circular del índice
+            let nextIdx = (idx + step + imgs.length) % imgs.length;
+            imgs[nextIdx].classList.add('active');
         }
 
-        // MODAL
         function openModal(btn, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
@@ -236,23 +257,4 @@
         function askDonation(e) {
             e.stopPropagation();
             Swal.fire({
-                title: '¿Descargar imagen?',
-                text: "Tu apoyo ayuda a conservar los bosques de Honduras.",
-                icon: 'info',
-                target: document.getElementById('imageModal'),
-                showCancelButton: true,
-                confirmButtonText: 'Donar y bajar',
-                cancelButtonText: 'Bajar gratis',
-                confirmButtonColor: '#059669'
-            }).then((res) => {
-                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
-                    const a = document.createElement('a');
-                    a.href = document.getElementById('fullImage').src;
-                    a.download = 'bosque-honduras.jpg';
-                    a.click();
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+                title: '¿Descargar imagen
