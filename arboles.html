@@ -3,208 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería por Álbumes con Donación</title>
+    <title>Álbum Bosques | Árboles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --primary: #2563eb;
-            --accent: #10b981;
-            --dark: #1f2937;
-            --light: #f3f4f6;
+        .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
+        .preview-img { 
+            width: 100%; height: 100%; object-fit: cover; object-position: center; 
+            position: absolute; transition: opacity 0.5s ease; 
+            z-index: 0; opacity: 0; 
         }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--light); padding: 20px; }
+        .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* Estructura de Álbumes */
-        .album-container { margin-bottom: 40px; }
-        .album-title { 
-            border-left: 5px solid var(--primary); 
-            padding-left: 15px; 
-            margin-bottom: 20px; 
-            color: var(--dark);
+        .photo-card { perspective: 1000px; height: 460px; transition: transform 0.3s; }
+        .inner-card { transition: transform 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
+        .flipped .inner-card { transform: rotateY(180deg); }
+        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; }
+        .back-card { 
+            transform: rotateY(180deg); background: #064e3b; color: white; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
-
-        .grid-album {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-        }
-
-        .grid-album img {
-            width: 100%; height: 150px;
-            object-fit: cover;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .grid-album img:hover { transform: translateY(-5px); }
-
-        /* Visor Pantalla Completa */
-        #viewer {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98);
-            z-index: 1000;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #viewer img { max-width: 90%; max-height: 75vh; border-radius: 5px; }
-
-        /* Controles */
-        .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 45px; cursor: pointer; opacity: 0.7; }
-        .close-btn:hover { opacity: 1; }
         
-        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); color: white; font-size: 50px; cursor: pointer; padding: 20px; user-select: none; }
-        .prev { left: 5px; }
-        .next { right: 5px; }
-
-        .controls-footer { margin-top: 25px; text-align: center; }
-        .btn-dl { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-
-        /* Modal de Donación */
-        #donation-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 350px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .modal-card h3 { margin-top: 0; color: var(--dark); }
-        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #fullImage { max-width: 90%; max-height: 80vh; object-fit: contain; }
         
-        .btn-donate { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-skip { background: transparent; color: #666; border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer; }
+        /* CLASE CLAVE: Si no está esta clase, el filtro no funciona */
+        .hidden-card { display: none !important; }
     </style>
 </head>
-<body>
+<body class="bg-stone-100 p-4 pt-48 md:pt-32">
 
-<div class="album-container" data-album-id="naturaleza">
-    <h2 class="album-title">Fotografía de Naturaleza</h2>
-    <div class="grid-album">
-        <img src="https://picsum.photos/id/10/1200/800" alt="Bosque">
-        <img src="https://picsum.photos/id/11/1200/800" alt="Río">
-        <img src="https://picsum.photos/id/12/1200/800" alt="Playa">
-    </div>
-</div>
-
-<div class="album-container" data-album-id="arquitectura">
-    <h2 class="album-title">Arquitectura Moderna</h2>
-    <div class="grid-album">
-        <img src="https://picsum.photos/id/1011/1200/800" alt="Edificio A">
-        <img src="https://picsum.photos/id/1031/1200/800" alt="Edificio B">
-        <img src="https://picsum.photos/id/1040/1200/800" alt="Castillo">
-        <img src="https://picsum.photos/id/1043/1200/800" alt="Muralla">
-    </div>
-</div>
-
-<div id="viewer">
-    <span class="close-btn" onclick="closeViewer()">&times;</span>
-    <span class="nav-btn prev" onclick="navigate(-1)">&#10094;</span>
-    <img id="full-img" src="">
-    <span class="nav-btn next" onclick="navigate(1)">&#10095;</span>
-    
-    <div class="controls-footer">
-        <button class="btn-dl" onclick="showDonation()">Descargar Imagen</button>
-    </div>
-</div>
-
-<div id="donation-modal">
-    <div class="modal-card">
-        <h3>¡Tu imagen está lista!</h3>
-        <p>¿Te gustaría apoyar nuestro trabajo con una donación antes de descargar?</p>
-        <div class="modal-actions">
-            <button class="btn-donate" onclick="handleAction('donar')">💖 Sí, quiero donar</button>
-            <button class="btn-skip" onclick="handleAction('descargar')">No, solo descargar</button>
+    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
+            <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all">
+                ❮ MENÚ
+            </a>
+            
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="¿Qué buscas? (ej: Pino)" 
+                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
+                
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none">
+                    <option value="all">Todos los años</option>
+                </select>
+            </div>
         </div>
-    </div>
-</div>
+    </nav>
 
-<script>
-    let currentAlbumImages = [];
-    let currentIndex = 0;
-    const viewer = document.getElementById('viewer');
-    const fullImg = document.getElementById('full-img');
-    const donationModal = document.getElementById('donation-modal');
-
-    // Inicializar clics por álbum
-    document.querySelectorAll('.album-container').forEach(album => {
-        const imgs = Array.from(album.querySelectorAll('img'));
+    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        imgs.forEach((img, index) => {
-            img.onclick = () => {
-                currentAlbumImages = imgs; // Guardamos solo las fotos de ESTE álbum
-                currentIndex = index;
-                openViewer();
-            };
+        <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
+            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
+                <div class="inner-card">
+                    <div class="front-card bg-white shadow-lg">
+                        <div class="img-container">
+                            <img src="img/Pino.jpg" class="preview-img active">
+                            <img src="img/hoja.jpg" class="preview-img">
+                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 bg-black/30 text-white p-2 rounded-full z-20">❯</button>
+                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
+                        </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="italic">"Bosques frescos y hojas estrelladas."</p>
+                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
+            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
+                <div class="inner-card">
+                    <div class="front-card bg-white shadow-lg">
+                        <div class="img-container">
+                            <img src="img/montaña.jpg" class="preview-img active">
+                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
+                        </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">San Juancito</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="italic">"Panorámica desde Francisco Morazán."</p>
+                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-card" data-name="pino ocote pinabete bosque" data-year="2026">
+            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
+                <div class="inner-card">
+                    <div class="front-card bg-white shadow-lg">
+                        <div class="img-container">
+                            <img src="img/bosque.jpg" class="preview-img active">
+                            <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-2 rounded-full z-20">🔍</button>
+                        </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="italic">"Honduras tiene 7 especies de pino."</p>
+                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="imageModal" onclick="closeModal()">
+        <span class="absolute top-5 right-10 text-white text-4xl cursor-pointer">&times;</span>
+        <img id="fullImage" src="">
+        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-6 py-2 rounded-full font-bold">Descargar Foto</button>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURACIÓN AL CARGAR LA PÁGINA ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const tarjetas = document.querySelectorAll('.photo-card');
+            const selectAnio = document.getElementById('yearFilter');
+            const listaAnios = new Set();
+
+            console.log("Sistema iniciado. Tarjetas encontradas:", tarjetas.length);
+
+            tarjetas.forEach(t => {
+                const anio = t.getAttribute('data-year');
+                if(anio) listaAnios.add(anio);
+            });
+
+            // Llenar el select automáticamente
+            Array.from(listaAnios).sort().reverse().forEach(anio => {
+                const opt = document.createElement('option');
+                opt.value = anio;
+                opt.textContent = anio;
+                selectAnio.appendChild(opt);
+            });
         });
-    });
 
-    function openViewer() {
-        fullImg.src = currentAlbumImages[currentIndex].src;
-        viewer.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
+        // --- 2. FUNCIÓN DE FILTRADO (Buscador + Año) ---
+        function filtrarContenido() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const anioFiltro = document.getElementById('yearFilter').value;
+            const tarjetas = document.querySelectorAll('.photo-card');
 
-    function closeViewer() {
-        viewer.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
+            tarjetas.forEach(tarjeta => {
+                const nombre = (tarjeta.getAttribute('data-name') || "").toLowerCase();
+                const anio = tarjeta.getAttribute('data-year') || "";
 
-    function navigate(dir) {
-        currentIndex += dir;
-        if (currentIndex < 0) currentIndex = currentAlbumImages.length - 1;
-        if (currentIndex >= currentAlbumImages.length) currentIndex = 0;
-        fullImg.src = currentAlbumImages[currentIndex].src;
-    }
+                const coincideTexto = nombre.includes(input);
+                const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
 
-    function showDonation() {
-        donationModal.style.display = 'flex';
-    }
-
-    function handleAction(type) {
-        donationModal.style.display = 'none';
-        if(type === 'donar') {
-            window.open('https://paypal.me/tu-usuario', '_blank'); // Cambia por tu link real
+                // Si cumple AMBAS condiciones, se muestra
+                if (coincideTexto && coincideAnio) {
+                    tarjeta.classList.remove('hidden-card');
+                } else {
+                    tarjeta.classList.add('hidden-card');
+                }
+            });
         }
-        triggerDownload();
-    }
 
-    function triggerDownload() {
-        const link = document.createElement('a');
-        link.href = fullImg.src;
-        link.download = `foto-album-${currentIndex + 1}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // Teclas rápidas
-    window.onkeydown = (e) => {
-        if (viewer.style.display === 'flex') {
-            if (e.key === "ArrowLeft") navigate(-1);
-            if (e.key === "ArrowRight") navigate(1);
-            if (e.key === "Escape") closeViewer();
+        // --- 3. FUNCIONES DE INTERACCIÓN ---
+        function handleFlip(card, e) {
+            if (e.target.closest('button')) return;
+            card.classList.toggle('flipped');
         }
-    };
-</script>
 
+        function changeSlide(btn, step, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[activeIdx].classList.remove('active');
+            imgs[(activeIdx + step) % imgs.length].classList.add('active');
+        }
+
+        function openModal(btn, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const activeImg = container.querySelector('.preview-img.active');
+            document.getElementById('fullImage').src = activeImg.src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: '¿Quieres descargar la foto?',
+                text: "Puedes apoyarnos con una donación o descargar gratis.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Donar y bajar',
+                cancelButtonText: 'Bajar gratis'
+            }).then(() => {
+                const link = document.createElement('a');
+                link.href = document.getElementById('fullImage').src;
+                link.download = 'foto-bosque.jpg';
+                link.click();
+            });
+        }
+    </script>
 </body>
 </html>
+
