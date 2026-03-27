@@ -7,18 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Contenedor de imagen: Efecto ventana */
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         
-        /* La imagen en la tarjeta se ve ampliada (solo una parte) */
         .preview-img { 
             width: 100%; height: 100%; object-fit: cover; object-position: center; 
             position: absolute; transition: all 0.5s ease; 
-            z-index: 0; opacity: 0; transform: scale(1.2); /* Zoom inicial para ver solo una parte */
+            z-index: 0; opacity: 0; transform: scale(1.2); 
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* Efecto 3D de la tarjeta */
         .photo-card { perspective: 1000px; height: 480px; transition: all 0.3s ease; }
         .inner-card { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
@@ -28,10 +25,8 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
         
-        /* Estilos del Modal y Ampliación */
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; overflow: auto; padding: 20px; }
         
-        /* Imagen dentro del modal con opción de zoom real */
         #fullImage { 
             max-width: 90%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; 
             transition: transform 0.3s ease; cursor: zoom-in; 
@@ -39,6 +34,10 @@
         #fullImage.zoomed { transform: scale(1.5); cursor: zoom-out; max-height: none; max-width: 95%; }
         
         .hidden-card { display: none !important; }
+
+        /* Estilo para el contador oculto inicialmente */
+        #filterCount { transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
+        #filterCount.show { opacity: 1; }
 
         body { padding-top: 12rem; }
         @media (min-width: 768px) { body { padding-top: 9rem; } }
@@ -82,8 +81,7 @@
                         </div>
                         <div class="p-5 text-center">
                             <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">Liquidámbar</h3>
-                            <p class="text-[10px] text-stone-400 mt-1">Hojas Estrelladas (Vista de Enfoque)</p>
-                        </div>
+                            </div>
                     </div>
                     <div class="back-card">
                         <p class="italic text-lg">"El liquidámbar es un árbol de zonas frescas que se caracteriza por la forma de su hoja."</p>
@@ -103,8 +101,7 @@
                         </div>
                         <div class="p-5 text-center">
                             <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">San Juancito</h3>
-                            <p class="text-[10px] text-stone-400 mt-1">Francisco Morazán</p>
-                        </div>
+                            </div>
                     </div>
                     <div class="back-card">
                         <p class="italic text-lg">"Panorámica tomada desde las alturas de San Juancito."</p>
@@ -118,7 +115,6 @@
 
     <div id="imageModal" onclick="closeModal()">
         <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 transition-colors z-50">&times;</span>
-        
         <div class="flex flex-col items-center">
             <p class="text-white text-xs mb-4 opacity-70">Haz clic en la imagen para ampliar/reducir</p>
             <img id="fullImage" src="" class="shadow-2xl border-4 border-white/10" onclick="toggleZoom(event)">
@@ -127,7 +123,6 @@
     </div>
 
     <script>
-        // --- INICIALIZACIÓN ---
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
@@ -146,13 +141,20 @@
                 const opt = new Option(anio, anio);
                 selectAnio.add(opt);
             });
-            actualizarContador();
         });
 
         function filtrarContenido() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const anioFiltro = document.getElementById('yearFilter').value;
             const tarjetas = document.querySelectorAll('.photo-card');
+            const contador = document.getElementById('filterCount');
+
+            // Mostrar el contador solo si hay actividad en los filtros
+            if (input !== "" || anioFiltro !== "all") {
+                contador.classList.add('show');
+            } else {
+                contador.classList.remove('show');
+            }
 
             tarjetas.forEach(t => {
                 const nombre = (t.getAttribute('data-name') || "").toLowerCase();
@@ -161,13 +163,14 @@
                 const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
                 t.classList.toggle('hidden-card', !(coincideBusqueda && coincideAnio));
             });
+            
             actualizarContador();
         }
 
         function actualizarContador() {
             const total = document.querySelectorAll('.photo-card').length;
             const visibles = document.querySelectorAll('.photo-card:not(.hidden-card)').length;
-            document.getElementById('filterCount').textContent = `Mostrando ${visibles} de ${total} fotos`;
+            document.getElementById('filterCount').textContent = `Resultados: ${visibles} de ${total}`;
         }
 
         function handleFlip(card, e) {
@@ -184,13 +187,12 @@
             imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
         }
 
-        // --- LÓGICA DE MODAL Y ZOOM ---
         function openModal(btn, e) {
             e.stopPropagation();
             const activa = btn.closest('.img-container').querySelector('.preview-img.active');
             const fullImg = document.getElementById('fullImage');
             fullImg.src = activa.src;
-            fullImg.classList.remove('zoomed'); // Reset zoom al abrir
+            fullImg.classList.remove('zoomed');
             document.getElementById('imageModal').style.display = 'flex';
         }
 
