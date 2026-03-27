@@ -15,45 +15,34 @@
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* PERSPECTIVA Y GIRO */
         .photo-card { perspective: 1000px; height: 460px; }
         .inner-card { 
             transition: transform 0.8s; 
             transform-style: preserve-3d; 
             position: relative; 
-            width: 100%; 
-            height: 100%; 
-            cursor: pointer;
+            width: 100%; height: 100%; cursor: pointer;
         }
         
         .flipped .inner-card { transform: rotateY(180deg); }
         
         .front-card, .back-card { 
             backface-visibility: hidden; 
-            position: absolute; 
-            inset: 0; 
-            border-radius: 1rem; 
-            overflow: hidden; 
+            position: absolute; inset: 0; 
+            border-radius: 1rem; overflow: hidden; 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
         .back-card { 
             transform: rotateY(180deg); 
-            background: #064e3b; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 2rem; 
-            text-align: center; 
+            background: #064e3b; color: white; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 2rem; text-align: center; 
         }
         
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; }
-        
         .hidden-card { display: none !important; }
-        .swal2-container { z-index: 10000 !important; }
 
         .nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
@@ -102,13 +91,13 @@
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Mariposa Malaquita</div>
                 </div>
                 <div class="back-card">
-                    <p class="italic text-lg">"Especie neotropical cuyos colores resaltan por verde lima o amarillentos."</p>
+                    <p class="italic text-lg">"Conocido como mariposa malaquita especie neotropical cuyos colores resaltan por verde lima o amarillentos"</p>
                     <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="chinche insecto" data-year="2026">
+        <div class="photo-card" data-name="san juancito chinche" data-year="2026">
             <div class="inner-card" onclick="handleFlip(this, event)">
                 <div class="front-card bg-white">
                     <div class="img-container">
@@ -120,5 +109,140 @@
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Chinche</div>
                 </div>
                 <div class="back-card">
-                    <p class="italic text-lg">"Insecto depredador que ayuda a controlar plagas."</p>
-                    <span
+                    <p class="italic text-lg">"Es un insecto depredador que se alimenta de otros insectos pequeños."</p>
+                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-card" data-name="pino ocote" data-year="2026">
+            <div class="inner-card" onclick="handleFlip(this, event)">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/bosque.jpg" class="preview-img active" loading="lazy">
+                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20 hover:bg-black/50">❯</button>
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"En Honduras podemos encontrar 7 especies de pinos."</p>
+                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <div id="imageModal" onclick="closeModal(event)">
+        <span class="absolute top-5 right-6 text-white text-6xl cursor-pointer hover:text-green-400 z-[110]" onclick="closeModal(event)">&times;</span>
+        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
+        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-10 py-4 rounded-full font-bold hover:bg-green-500 transition-colors z-[110] shadow-xl">Descargar Foto</button>
+    </div>
+
+    <script>
+        let currentBlockImages = [];
+        let currentBlockIdx = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const tarjetas = document.querySelectorAll('.photo-card');
+            const selectAnio = document.getElementById('yearFilter');
+            const listaAnios = new Set();
+            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
+            Array.from(listaAnios).sort().reverse().forEach(anio => {
+                if(anio) selectAnio.add(new Option(anio, anio));
+            });
+
+            // LOGICA CRITICA: Ocultar flechas si hay solo 1 imagen
+            document.querySelectorAll('.img-container').forEach(container => {
+                const fotos = container.querySelectorAll('.preview-img');
+                const botonFlecha = container.querySelector('button[onclick*="changeSlide"]');
+                if (fotos.length <= 1 && botonFlecha) {
+                    botonFlecha.remove(); // Eliminamos el botón si no es necesario
+                }
+            });
+        });
+
+        function filtrarContenido() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(card => {
+                const matchText = card.dataset.name.toLowerCase().includes(query);
+                const matchYear = year === 'all' || card.dataset.year === year;
+                card.classList.toggle('hidden-card', !(matchText && matchYear));
+            });
+        }
+
+        function handleFlip(innerCard, e) {
+            if (e.target.closest('button')) return;
+            const parentCard = innerCard.closest('.photo-card');
+            parentCard.classList.toggle('flipped');
+        }
+
+        function changeSlide(btn, step, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            if (imgs.length <= 1) return;
+            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[idx].classList.remove('active');
+            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
+        }
+
+        function openModal(btn, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            currentBlockImages = Array.from(imgs).map(img => img.src);
+            currentBlockIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            
+            document.getElementById('modalPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalNext').style.display = imgs.length > 1 ? 'flex' : 'none';
+            
+            updateModal();
+            document.getElementById('imageModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function navigateBlockModal(step, e) {
+            e.stopPropagation();
+            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
+            updateModal();
+        }
+
+        function updateModal() {
+            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'imageModal' || e.target.innerText === '×') {
+                document.getElementById('imageModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: '¿Descargar?',
+                text: "Wild Life Honduras",
+                icon: 'info',
+                target: document.getElementById('imageModal'),
+                showCancelButton: true,
+                confirmButtonText: 'Donar',
+                cancelButtonText: 'Gratis',
+                confirmButtonColor: '#059669'
+            }).then((res) => {
+                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
+                    const a = document.createElement('a');
+                    a.href = document.getElementById('fullImage').src;
+                    a.download = 'wildlife.jpg';
+                    a.click();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
