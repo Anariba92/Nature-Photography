@@ -55,15 +55,29 @@
         .hidden-card { display: none !important; }
         .swal2-container { z-index: 10000 !important; }
 
-        /* Estilo general para flechas de navegación */
+        /* --- CORRECCIÓN DE FLECHAS EN TARJETAS --- */
         .nav-arrow {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.3); color: white; border-radius: 50%;
-            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s; z-index: 25;
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5); 
+            color: white; 
+            border-radius: 50%;
+            width: 35px; 
+            height: 35px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.3s; 
+            z-index: 30; /* Por encima de la imagen */
+            border: none;
+            cursor: pointer;
         }
-        .nav-arrow:hover { background: rgba(0,0,0,0.6); }
+        .nav-arrow:hover { background: rgba(0, 0, 0, 0.8); scale: 1.1; }
+        .arrow-left { left: 10px; }
+        .arrow-right { right: 10px; }
 
+        /* Botones del Modal */
         .nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
@@ -108,10 +122,10 @@
                         <img src="img/hoja.jpg" class="preview-img" loading="lazy">
                         <img src="img/tronco.jpg" class="preview-img" loading="lazy">
                         
-                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
-                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
                         
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-40 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
                 </div>
@@ -127,134 +141,8 @@
                 <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/montaña.jpg" class="preview-img active" loading="lazy">
-                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
-                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
+                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
+                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
+                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-40 shadow-lg">🔍</button>
                     </div>
-                    <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
-                </div>
-                <div class="back-card">
-                    <p class="italic text-lg">"Panorámica desde las alturas de la mina."</p>
-                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="photo-card" data-name="pino ocote pinabete bosque" data-year="2026">
-            <div class="inner-card" onclick="handleFlip(this, event)">
-                <div class="front-card bg-white">
-                    <div class="img-container">
-                        <img src="img/bosque.jpg" class="preview-img active" loading="lazy">
-                        <img src="img/bellota.jpg" class="preview-img" loading="lazy">
-                        
-                        <button onclick="changeSlide(this, -1, event)" class="nav-arrow left-2">❮</button>
-                        <button onclick="changeSlide(this, 1, event)" class="nav-arrow right-2">❯</button>
-                        
-                        <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
-                    </div>
-                    <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
-                </div>
-                <div class="back-card">
-                    <p class="italic text-lg">"En Honduras podemos encontrar 7 especies de pinos."</p>
-                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
-                </div>
-            </div>
-        </div>
-        
-    </main>
-
-    <div id="imageModal" onclick="closeModal(event)">
-        <span class="absolute top-5 right-6 text-white text-6xl cursor-pointer hover:text-green-400 z-[110]" onclick="closeModal(event)">&times;</span>
-        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
-        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
-        <img id="fullImage" src="" onclick="event.stopPropagation()">
-        <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-10 py-4 rounded-full font-bold hover:bg-green-500 transition-colors z-[110] shadow-xl">Descargar Foto</button>
-    </div>
-
-    <script>
-        let currentBlockImages = [];
-        let currentBlockIdx = 0;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const tarjetas = document.querySelectorAll('.photo-card');
-            const selectAnio = document.getElementById('yearFilter');
-            const listaAnios = new Set();
-            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
-            Array.from(listaAnios).sort().reverse().forEach(anio => {
-                if(anio) selectAnio.add(new Option(anio, anio));
-            });
-
-            // Ocultar flechas si la tarjeta solo tiene una imagen
-            document.querySelectorAll('.img-container').forEach(container => {
-                const totalImgs = container.querySelectorAll('.preview-img').length;
-                if (totalImgs <= 1) {
-                    container.querySelectorAll('.nav-arrow').forEach(btn => btn.style.display = 'none');
-                }
-            });
-        });
-
-        function filtrarContenido() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const year = document.getElementById('yearFilter').value;
-            document.querySelectorAll('.photo-card').forEach(card => {
-                const matchText = card.dataset.name.toLowerCase().includes(query);
-                const matchYear = year === 'all' || card.dataset.year === year;
-                card.classList.toggle('hidden-card', !(matchText && matchYear));
-            });
-        }
-
-        function handleFlip(innerCard, e) {
-            if (e.target.closest('button')) return;
-            const parentCard = innerCard.closest('.photo-card');
-            parentCard.classList.toggle('flipped');
-        }
-
-        // SLIDER INTERNO MEJORADO (Anterior y Siguiente)
-        function changeSlide(btn, step, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            
-            imgs[idx].classList.remove('active');
-            // Cálculo circular del índice
-            let nextIdx = (idx + step + imgs.length) % imgs.length;
-            imgs[nextIdx].classList.add('active');
-        }
-
-        function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            currentBlockImages = Array.from(imgs).map(img => img.src);
-            currentBlockIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
-            
-            document.getElementById('modalPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
-            document.getElementById('modalNext').style.display = imgs.length > 1 ? 'flex' : 'none';
-            
-            updateModal();
-            document.getElementById('imageModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function navigateBlockModal(step, e) {
-            e.stopPropagation();
-            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
-            updateModal();
-        }
-
-        function updateModal() {
-            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
-        }
-
-        function closeModal(e) {
-            if (e.target.id === 'imageModal' || e.target.innerText === '×') {
-                document.getElementById('imageModal').style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        function askDonation(e) {
-            e.stopPropagation();
-            Swal.fire({
-                title: '¿Descargar imagen
+                    <div class="p-4 text-center
