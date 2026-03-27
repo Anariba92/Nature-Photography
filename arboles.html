@@ -3,46 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Bosques | Árboles</title>
+    <title>Álbum Bosques | Árboles Mejorado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Contenedor principal de la imagen */
+        /* --- ESTILOS BASE Y CONTENEDOR --- */
         .img-container { 
-            height: 380px; 
-            overflow: hidden; 
+            height: 380px; /* Altura total de la zona de imagen */
             position: relative; 
             background: #1a1a1a;
             border-radius: 1rem 1rem 0 0; 
+            /* Importante para que las flechas sobresalgan: NO usar overflow: hidden aquí */
         }
 
-        /* Efecto de recorte con degradado */
-        .preview-cut {
-            height: 200px !important; /* Altura recortada */
+        /* Contenedor interno para el recorte y el degradado */
+        .img-clip {
+            width: 100%;
+            height: 250px; /* Altura recortada visual */
+            overflow: hidden;
+            position: relative;
+            border-radius: 1rem 1rem 0 0;
         }
         
-        .preview-cut::after {
+        /* Efecto de degradado sutil en la parte inferior del recorte */
+        .img-clip::after {
             content: "";
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            background: linear-gradient(transparent, #1a1a1a);
+            height: 60px;
+            background: linear-gradient(transparent, rgba(26, 26, 26, 0.8));
             z-index: 15;
+            pointer-events: none; /* Permite clicks a través del degradado */
         }
 
+        /* --- IMÁGENES (RELLENAR RECTÁNGULO) --- */
         .preview-img {
-            width: 100%; height: 100%; object-fit: cover; object-position: center; 
-            position: absolute; transition: opacity 0.5s ease; 
-            z-index: 0; opacity: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* RELLENA EL RECTÁNGULO sin deformar */
+            object-position: center; 
+            position: absolute; 
+            top: 0;
+            left: 0;
+            transition: opacity 0.5s ease; 
+            z-index: 0; 
+            opacity: 0; 
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        .photo-card { perspective: 1000px; height: 460px; transition: transform 0.3s; }
+        /* --- TARJETA Y GIRO --- */
+        .photo-card { perspective: 1000px; height: 480px; transition: transform 0.3s; }
         .inner-card { transition: transform 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; }
+        .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .back-card { 
             transform: rotateY(180deg); background: #064e3b; color: white; 
@@ -50,26 +65,56 @@
             padding: 2rem; text-align: center; 
         }
         
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; border-radius: 8px; }
+        /* --- MODAL --- */
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        #fullImage { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
         
         .hidden-card { display: none !important; }
 
-        /* Botón de expandir dentro de la card */
+        /* --- BOTÓN ICONO EXPANDIR --- */
         .expand-btn {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            background: rgba(255,255,255,0.9);
+            bottom: 15px;
+            right: 15px;
+            z-index: 25; /* Por encima del degradado */
+            background: rgba(255,255,255,0.85);
             color: #064e3b;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            paddign: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s;
         }
+        .expand-btn:hover { transform: scale(1.1); background: rgba(255,255,255,1); }
+
+        /* --- FLECHAS NAVEGACIÓN SOBRESALIENTES --- */
+        .nav-btn {
+            position: absolute;
+            top: 125px; /* Centrado vertical relativo al recorte (250px / 2) */
+            transform: translateY(-50%);
+            background: white;
+            color: #064e3b;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            z-index: 30; /* Por encima de todo en la card */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            border: 2px solid #064e3b;
+        }
+        .nav-btn:hover { background: #f0f0f0; transform: translateY(-50%) scale(1.1); }
+        
+        /* Posiciones sobresalientes */
+        .prev-btn { left: -18px; } /* Sobresale por la izquierda */
+        .next-btn { right: -18px; } /* Sobresale por la derecha */
+
     </style>
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
@@ -87,25 +132,35 @@
         </div>
     </nav>
  
-    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         
-        <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
+        <div class="photo-card" data-name="liquidambar arbol estrella pino" data-year="2026">
             <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container preview-cut">
-                            <img src="img/Pino.jpg" class="preview-img active">
-                            <img src="img/hoja.jpg" class="preview-img">
-                            
-                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full z-20 hover:bg-black/50">❯</button>
-                            
-                            <button onclick="openModal(this, event)" class="expand-btn">EXPANDIR 🔍</button>
+                    <div class="front-card bg-white">
+                        <div class="img-container">
+                            <button onclick="changeSlide(this, -1, event)" class="nav-btn prev-btn">❮</button>
+                            <button onclick="changeSlide(this, 1, event)" class="nav-btn next-btn">❯</button>
+
+                            <div class="img-clip">
+                                <img src="img/Pino.jpg" class="preview-img active">
+                                <img src="img/hoja.jpg" class="preview-img">
+                                
+                                <button onclick="openModal(this, event)" class="expand-btn" title="Ver pantalla completa">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <polyline points="9 21 3 21 3 15"></polyline>
+                                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-wider">Liquidámbar</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Bosques frescos y hojas estrelladas."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                        <p class="italic text-lg">"Bosques frescos y hojas estrelladas."</p>
+                        <span class="text-sm mt-6 py-1 px-3 bg-white/20 rounded-full">AÑO: 2026</span>
                     </div>
                 </div>
             </div>
@@ -114,16 +169,25 @@
         <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
             <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
                 <div class="inner-card">
-                    <div class="front-card bg-white shadow-lg">
-                        <div class="img-container preview-cut">
-                            <img src="img/montaña.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="expand-btn">EXPANDIR 🔍</button>
+                    <div class="front-card bg-white">
+                        <div class="img-container">
+                            <div class="img-clip">
+                                <img src="img/montaña.jpg" class="preview-img active">
+                                <button onclick="openModal(this, event)" class="expand-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <polyline points="9 21 3 21 3 15"></polyline>
+                                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <div class="p-4 text-center font-bold text-green-900 uppercase">San Juancito</div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase tracking-wider">San Juancito</div>
                     </div>
                     <div class="back-card">
-                        <p class="italic">"Panorámica desde Francisco Morazán."</p>
-                        <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                        <p class="italic text-lg">"Panorámica desde Francisco Morazán."</p>
+                        <span class="text-sm mt-6 py-1 px-3 bg-white/20 rounded-full">AÑO: 2026</span>
                     </div>
                 </div>
             </div>
@@ -132,11 +196,14 @@
     </main>
  
     <div id="imageModal">
-        <span onclick="closeModal()" class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-gray-300">&times;</span>
+        <span onclick="closeModal()" class="absolute top-5 right-8 text-white text-6xl cursor-pointer hover:text-gray-300 z-50">&times;</span>
         <img id="fullImage" src="">
-        <div class="flex gap-4">
-            <button onclick="closeModal()" class="mt-5 bg-white/20 text-white border border-white/50 px-6 py-2 rounded-full font-bold hover:bg-white/30 transition-all">Cerrar</button>
-            <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-8 py-2 rounded-full font-bold hover:bg-green-500 shadow-lg transform hover:scale-105 transition-all">Descargar Foto</button>
+        <div class="flex gap-4 mt-6 z-50">
+            <button onclick="closeModal()" class="bg-white/10 text-white border border-white/30 px-6 py-2.5 rounded-full font-semibold hover:bg-white/20 transition-all">Cerrar</button>
+            <button onclick="askDonation(event)" class="bg-green-600 text-white px-8 py-2.5 rounded-full font-bold hover:bg-green-500 shadow-lg transform hover:scale-105 transition-all flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Descargar Foto
+            </button>
         </div>
     </div>
  
@@ -182,15 +249,19 @@
  
         // --- 3. INTERACCIONES ---
         function handleFlip(card, e) {
-            // Evita que la tarjeta gire si haces clic en los botones de expandir o cambio de imagen
+            // No girar si se hace click en botones de navegación o expandir
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
  
         function changeSlide(btn, step, e) {
-            e.stopPropagation();
+            e.stopPropagation(); // Evita el giro de la tarjeta
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
+            
+            // Si solo hay una imagen, no hace nada
+            if (imgs.length <= 1) return;
+
             let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             
             imgs[activeIdx].classList.remove('active');
@@ -200,7 +271,7 @@
         }
  
         function openModal(btn, e) {
-            e.stopPropagation();
+            e.stopPropagation(); // Evita el giro de la tarjeta
             const container = btn.closest('.img-container');
             const activeImg = container.querySelector('.preview-img.active');
             document.getElementById('fullImage').src = activeImg.src;
@@ -228,10 +299,11 @@
             }).then((result) => {
                 // Independientemente del resultado, procedemos a la descarga
                 if (result.isConfirmed) {
-                    // Aquí podrías redirigir a una página de PayPal/Donación antes o después
+                    // Abre link de donación (reemplaza con tu link real)
                     window.open('https://paypal.me/tu-usuario', '_blank');
                     descargarImagen(imageUrl);
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Solo descarga
                     descargarImagen(imageUrl);
                 }
             });
@@ -240,18 +312,20 @@
         function descargarImagen(url) {
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'foto-bosque.jpg';
+            link.download = 'foto-bosque.jpg'; // Nombre por defecto del archivo
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
+            // Toast de notificación sutil
             Swal.fire({
                 toast: true,
                 position: 'top-end',
                 icon: 'success',
                 title: 'Descarga iniciada',
                 showConfirmButton: false,
-                timer: 2000
+                timer: 2500,
+                timerProgressBar: true
             });
         }
     </script>
