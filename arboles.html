@@ -7,7 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* Contenedor de imagen con altura fija */
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
+        
+        /* Estilo de las imágenes del slider */
         .preview-img { 
             width: 100%; height: 100%; object-fit: cover; object-position: center; 
             position: absolute; transition: opacity 0.5s ease; 
@@ -15,6 +18,7 @@
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
+        /* Efecto de giro (Flip) */
         .photo-card { perspective: 1000px; height: 460px; transition: transform 0.3s; }
         .inner-card { transition: transform 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
@@ -23,6 +27,199 @@
             transform: rotateY(180deg); background: #064e3b; color: white; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
+        
+        /* Modal de imagen completa */
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #fullImage { max-width: 90%; max-height: 70vh; object-fit: contain; border-radius: 0.5rem; }
+        
+        .hidden-card { display: none !important; }
+
+        /* Botones de navegación del Modal */
+        .nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
+            width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; transition: all 0.3s; z-index: 100;
+        }
+        .btn-prev { left: 15px; }
+        .btn-next { right: 15px; }
+
+        /* Ajustes específicos para móviles */
+        @media (max-width: 768px) {
+            .nav-btn { width: 50px; height: 50px; background: rgba(0,0,0,0.6); }
+            .img-container { height: 300px; }
+            .photo-card { height: 400px; }
+            body { padding-top: 220px; } /* Ajuste por el menú fijo en móvil */
+        }
+    </style>
+</head>
+<body class="bg-stone-100 p-4 pt-32">
+
+    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
+            <a href="#" class="bg-green-900 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all">
+                ❮ MENÚ
+            </a>
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar (ej: Pino)" 
+                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none">
+                    <option value="all">Todos los años</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div class="photo-card" data-name="liquidambar pino arbol" data-year="2026">
+            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
+                <div class="inner-card shadow-xl">
+                    <div class="front-card bg-white">
+                        <div class="img-container">
+                            <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=800" class="preview-img active" loading="lazy">
+                            <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800" class="preview-img" loading="lazy">
+                            
+                            <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full z-20">❯</button>
+                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-20 shadow-md">🔍</button>
+                        </div>
+                        <div class="p-4 text-center font-extrabold text-green-900 uppercase tracking-wider">Liquidámbar</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="italic text-lg">"Se puede encontrar en climas frescos de las montañas de Honduras."</p>
+                        <div class="mt-4 pt-4 border-t border-white/20 w-full text-xs opacity-80 uppercase">Año de captura: 2026</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="photo-card" data-name="montaña paisaje" data-year="2025">
+            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
+                <div class="inner-card shadow-xl">
+                    <div class="front-card bg-white">
+                        <div class="img-container">
+                            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800" class="preview-img active" loading="lazy">
+                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-3 rounded-full z-20">🔍</button>
+                        </div>
+                        <div class="p-4 text-center font-bold text-green-900 uppercase">San Juancito</div>
+                    </div>
+                    <div class="back-card">
+                        <p class="italic text-lg">"Vista panorámica desde las alturas de la mina."</p>
+                        <span class="text-xs mt-4 opacity-70">AÑO: 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="imageModal" onclick="closeModal(event)">
+        <span class="absolute top-5 right-6 text-white text-5xl cursor-pointer z-[110]" onclick="closeModal(event)">&times;</span>
+        
+        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
+        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
+
+        <img id="fullImage" src="" onclick="event.stopPropagation()">
+        
+        <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-10 py-3 rounded-full font-bold shadow-lg z-[110]">
+            Descargar Foto
+        </button>
+    </div>
+
+    <script>
+        let currentBlockImages = [];
+        let currentBlockIdx = 0;
+
+        // Cargar años dinámicamente
+        window.addEventListener('DOMContentLoaded', () => {
+            const tarjetas = document.querySelectorAll('.photo-card');
+            const selectAnio = document.getElementById('yearFilter');
+            const anios = [...new Set(Array.from(tarjetas).map(t => t.dataset.year))].sort().reverse();
+            anios.forEach(a => {
+                const opt = new Option(a, a);
+                selectAnio.add(opt);
+            });
+        });
+
+        function filtrarContenido() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(card => {
+                const matchText = card.dataset.name.toLowerCase().includes(query);
+                const matchYear = year === 'all' || card.dataset.year === year;
+                card.classList.toggle('hidden-card', !(matchText && matchYear));
+            });
+        }
+
+        function handleFlip(card, e) {
+            // No girar si tocas la lupa, el botón de slide o la imagen (para móvil)
+            if (e.target.closest('button') || e.target.closest('.img-container')) return;
+            card.classList.toggle('flipped');
+        }
+
+        function changeSlide(btn, step, e) {
+            e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[idx].classList.remove('active');
+            imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
+        }
+
+        function openModal(btn, e) {
+            if(e) e.stopPropagation();
+            const container = btn.closest('.img-container');
+            const imgs = container.querySelectorAll('.preview-img');
+            currentBlockImages = Array.from(imgs).map(i => i.src);
+            currentBlockIdx = Array.from(imgs).findIndex(i => i.classList.contains('active'));
+            
+            document.getElementById('modalPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
+            document.getElementById('modalNext').style.display = imgs.length > 1 ? 'flex' : 'none';
+            
+            updateModal();
+            document.getElementById('imageModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function navigateBlockModal(step, e) {
+            e.stopPropagation();
+            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
+            updateModal();
+        }
+
+        function updateModal() {
+            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'imageModal' || e.target.innerHTML === '×') {
+                document.getElementById('imageModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function askDonation(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: '¿Descargar imagen?',
+                text: "Puedes apoyarnos con una donación para la conservación de bosques.",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Donar y bajar',
+                cancelButtonText: 'Bajar gratis',
+                confirmButtonColor: '#059669'
+            }).then((res) => {
+                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
+                    const a = document.createElement('a');
+                    a.href = document.getElementById('fullImage').src;
+                    a.download = 'bosque-honduras.jpg';
+                    a.click();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
         
         #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; cursor: default; }
