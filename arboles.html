@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* Bloqueo de scroll cuando el modal está abierto */
+        body.modal-open { overflow: hidden; }
+
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         .preview-img { 
             width: 100%; height: 100%; object-fit: cover; object-position: center; 
@@ -15,43 +18,41 @@
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
-        /* PERSPECTIVA Y GIRO */
-        .photo-card { perspective: 1000px; height: 460px; }
+        /* PERSPECTIVA Y GIRO OPTIMIZADO PARA MÓVIL */
+        .photo-card { perspective: 1200px; -webkit-perspective: 1200px; height: 460px; }
         .inner-card { 
-            transition: transform 0.8s; 
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             transform-style: preserve-3d; 
+            -webkit-transform-style: preserve-3d;
             position: relative; 
-            width: 100%; 
-            height: 100%; 
-            cursor: pointer;
+            width: 100%; height: 100%; cursor: pointer;
         }
         
-        /* Esta es la clase que hace el giro */
-        .flipped .inner-card { transform: rotateY(180deg); }
+        /* Clase de giro */
+        .flipped .inner-card { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
         
         .front-card, .back-card { 
             backface-visibility: hidden; 
-            position: absolute; 
-            inset: 0; 
-            border-radius: 1rem; 
-            overflow: hidden; 
+            -webkit-backface-visibility: hidden;
+            position: absolute; inset: 0; 
+            border-radius: 1rem; overflow: hidden; 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
+        .front-card { z-index: 2; }
+
         .back-card { 
             transform: rotateY(180deg); 
-            background: #064e3b; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 2rem; 
-            text-align: center; 
+            -webkit-transform: rotateY(180deg);
+            background: #064e3b; color: white; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 2rem; text-align: center;
+            z-index: 1; /* Se vuelve visible al girar */
         }
         
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; }
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+        #fullImage { max-width: 90%; max-height: 70vh; object-fit: contain; border-radius: 0.5rem; }
         
         .hidden-card { display: none !important; }
         .swal2-container { z-index: 10000 !important; }
@@ -60,16 +61,16 @@
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
             width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; transition: all 0.3s; z-index: 100;
+            font-size: 24px; transition: all 0.3s; z-index: 100; border: none;
         }
         .btn-prev { left: 15px; }
         .btn-next { right: 15px; }
 
         @media (max-width: 768px) {
             .nav-btn { width: 45px; height: 45px; background: rgba(0,0,0,0.5); }
-            .img-container { height: 300px; }
-            .photo-card { height: 400px; }
-            body { padding-top: 220px; }
+            .img-container { height: 320px; }
+            .photo-card { height: 420px; }
+            body { padding-top: 210px; }
         }
     </style>
 </head>
@@ -99,7 +100,7 @@
                         <img src="img/Pino.jpg" class="preview-img active" loading="lazy">
                         <img src="img/hoja.jpg" class="preview-img" loading="lazy">
                         <img src="img/bosque.jpg" class="preview-img" loading="lazy">
-                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20 hover:bg-black/50">❯</button>
+                        <button onclick="changeSlide(this, 1, event)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-3 rounded-full z-20">❯</button>
                         <button onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-20 shadow-lg">🔍</button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
@@ -157,18 +158,23 @@
         let currentBlockImages = [];
         let currentBlockIdx = 0;
 
-        // Cargar años
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
             const listaAnios = new Set();
-            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
+            tarjetas.forEach(t => { if(t.dataset.year) listaAnios.add(t.dataset.year) });
             Array.from(listaAnios).sort().reverse().forEach(anio => {
-                if(anio) selectAnio.add(new Option(anio, anio));
+                selectAnio.add(new Option(anio, anio));
+            });
+
+            // Limpiar flechas innecesarias
+            document.querySelectorAll('.img-container').forEach(container => {
+                const fotos = container.querySelectorAll('.preview-img');
+                const botonFlecha = container.querySelector('button[onclick*="changeSlide"]');
+                if (fotos.length <= 1 && botonFlecha) botonFlecha.remove();
             });
         });
 
-        // FILTRADO
         function filtrarContenido() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const year = document.getElementById('yearFilter').value;
@@ -179,27 +185,23 @@
             });
         }
 
-        // GIRO DE CARTA (CORREGIDO)
+        // GIRO DE CARTA MEJORADO
         function handleFlip(innerCard, e) {
-            // Evita girar si haces clic en los botones
             if (e.target.closest('button')) return;
-            
-            // Buscamos el contenedor padre .photo-card y le ponemos la clase .flipped
             const parentCard = innerCard.closest('.photo-card');
             parentCard.classList.toggle('flipped');
         }
 
-        // SLIDER INTERNO
         function changeSlide(btn, step, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
             const imgs = container.querySelectorAll('.preview-img');
+            if (imgs.length <= 1) return;
             let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[idx].classList.remove('active');
             imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
         }
 
-        // MODAL
         function openModal(btn, e) {
             e.stopPropagation();
             const container = btn.closest('.img-container');
@@ -212,7 +214,7 @@
             
             updateModal();
             document.getElementById('imageModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
 
         function navigateBlockModal(step, e) {
@@ -228,7 +230,7 @@
         function closeModal(e) {
             if (e.target.id === 'imageModal' || e.target.innerText === '×') {
                 document.getElementById('imageModal').style.display = 'none';
-                document.body.style.overflow = 'auto';
+                document.body.classList.remove('modal-open');
             }
         }
 
@@ -240,8 +242,8 @@
                 icon: 'info',
                 target: document.getElementById('imageModal'),
                 showCancelButton: true,
-                confirmButtonText: 'Donar y bajar',
-                cancelButtonText: 'Bajar gratis',
+                confirmButtonText: 'Donar',
+                cancelButtonText: 'Gratis',
                 confirmButtonColor: '#059669'
             }).then((res) => {
                 if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
