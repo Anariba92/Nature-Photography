@@ -7,14 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Contenedor de imagen con aspecto consistente */
+        /* Contenedor de imagen: Efecto ventana */
         .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
         
-        /* Transiciones suaves para el slider de imágenes */
+        /* La imagen en la tarjeta se ve ampliada (solo una parte) */
         .preview-img { 
             width: 100%; height: 100%; object-fit: cover; object-position: center; 
-            position: absolute; transition: opacity 0.5s ease; 
-            z-index: 0; opacity: 0; 
+            position: absolute; transition: all 0.5s ease; 
+            z-index: 0; opacity: 0; transform: scale(1.2); /* Zoom inicial para ver solo una parte */
         }
         .preview-img.active { opacity: 1; z-index: 10; }
         
@@ -22,22 +22,24 @@
         .photo-card { perspective: 1000px; height: 480px; transition: all 0.3s ease; }
         .inner-card { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flipped .inner-card { transform: rotateY(180deg); }
-        
         .front-card, .back-card { backface-visibility: hidden; position: absolute; inset: 0; border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        
         .back-card { 
             transform: rotateY(180deg); background: #064e3b; color: white; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; 
         }
         
-        /* Estilos del Modal */
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; }
+        /* Estilos del Modal y Ampliación */
+        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; overflow: auto; padding: 20px; }
         
-        /* Clase para ocultar tarjetas mediante el filtro */
+        /* Imagen dentro del modal con opción de zoom real */
+        #fullImage { 
+            max-width: 90%; max-height: 75vh; object-fit: contain; border-radius: 0.5rem; 
+            transition: transform 0.3s ease; cursor: zoom-in; 
+        }
+        #fullImage.zoomed { transform: scale(1.5); cursor: zoom-out; max-height: none; max-width: 95%; }
+        
         .hidden-card { display: none !important; }
 
-        /* Espaciado responsivo para el contenido */
         body { padding-top: 12rem; }
         @media (min-width: 768px) { body { padding-top: 9rem; } }
     </style>
@@ -58,8 +60,7 @@
             <div class="flex flex-wrap gap-2 w-full md:w-auto">
                 <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar especie o lugar..." 
                     class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600 shadow-sm transition-all">
-                
-                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none shadow-sm cursor-pointer hover:border-green-600 transition-colors">
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white outline-none shadow-sm cursor-pointer hover:border-green-600">
                     <option value="all">Todos los años</option>
                 </select>
             </div>
@@ -81,7 +82,7 @@
                         </div>
                         <div class="p-5 text-center">
                             <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">Liquidámbar</h3>
-                            <p class="text-[10px] text-stone-400 mt-1">Hojas Estrelladas</p>
+                            <p class="text-[10px] text-stone-400 mt-1">Hojas Estrelladas (Vista de Enfoque)</p>
                         </div>
                     </div>
                     <div class="back-card">
@@ -113,33 +114,16 @@
             </div>
         </div>
 
-        <div class="photo-card" data-name="pino ocote pinabete bosque nacional" data-year="2024">
-            <div class="relative h-full cursor-pointer" onclick="handleFlip(this, event)">
-                <div class="inner-card">
-                    <div class="front-card bg-white">
-                        <div class="img-container">
-                            <img src="img/bosque.jpg" class="preview-img active">
-                            <button onclick="openModal(this, event)" class="absolute top-3 right-3 bg-green-600 text-white p-2.5 rounded-full z-20 shadow-lg hover:scale-110">🔍</button>
-                        </div>
-                        <div class="p-5 text-center">
-                            <h3 class="font-bold text-green-900 uppercase tracking-widest text-sm">Pino Ocote</h3>
-                            <p class="text-[10px] text-stone-400 mt-1">Árbol Nacional</p>
-                        </div>
-                    </div>
-                    <div class="back-card">
-                        <p class="italic text-lg">"Honduras cuenta con 7 especies de pino en su territorio nacional."</p>
-                        <div class="mt-6 pt-4 border-t border-white/20 w-full text-xs opacity-60">Foto publicada: 2024</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <div id="imageModal" onclick="closeModal()">
-        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 transition-colors">&times;</span>
-        <img id="fullImage" src="" class="shadow-2xl border-4 border-white/10" onclick="event.stopPropagation()">
-        <button onclick="askDonation(event)" class="mt-8 bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all active:scale-95">📥 Descargar Fotografía</button>
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 transition-colors z-50">&times;</span>
+        
+        <div class="flex flex-col items-center">
+            <p class="text-white text-xs mb-4 opacity-70">Haz clic en la imagen para ampliar/reducir</p>
+            <img id="fullImage" src="" class="shadow-2xl border-4 border-white/10" onclick="toggleZoom(event)">
+            <button onclick="askDonation(event)" class="mt-8 bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-xl transition-all active:scale-95">📥 Descargar Fotografía</button>
+        </div>
     </div>
 
     <script>
@@ -150,27 +134,21 @@
             const listaAnios = new Set();
 
             tarjetas.forEach(t => {
-                // Registrar años para el selector automático
                 const anio = t.getAttribute('data-year');
                 if(anio) listaAnios.add(anio);
-
-                // Ocultar flechas de navegación si la tarjeta tiene solo 1 imagen
                 const imgs = t.querySelectorAll('.preview-img');
                 if (imgs.length <= 1) {
                     t.querySelectorAll('.img-container button:not(:last-child)').forEach(b => b.style.display = 'none');
                 }
             });
 
-            // Generar opciones de años dinámicamente
             Array.from(listaAnios).sort().reverse().forEach(anio => {
                 const opt = new Option(anio, anio);
                 selectAnio.add(opt);
             });
-
             actualizarContador();
         });
 
-        // --- MOTOR DE FILTRADO ---
         function filtrarContenido() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const anioFiltro = document.getElementById('yearFilter').value;
@@ -179,11 +157,8 @@
             tarjetas.forEach(t => {
                 const nombre = (t.getAttribute('data-name') || "").toLowerCase();
                 const anio = t.getAttribute('data-year') || "";
-                
-                // Una tarjeta es visible si coincide el nombre Y el año
                 const coincideBusqueda = nombre.includes(input);
                 const coincideAnio = (anioFiltro === 'all' || anio === anioFiltro);
-                
                 t.classList.toggle('hidden-card', !(coincideBusqueda && coincideAnio));
             });
             actualizarContador();
@@ -195,9 +170,7 @@
             document.getElementById('filterCount').textContent = `Mostrando ${visibles} de ${total} fotos`;
         }
 
-        // --- INTERACCIONES ---
         function handleFlip(card, e) {
-            // Evita girar la tarjeta si se hace clic en un botón (🔍 o flechas)
             if (e.target.closest('button')) return;
             card.classList.toggle('flipped');
         }
@@ -208,14 +181,16 @@
             const imgs = container.querySelectorAll('.preview-img');
             let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
             imgs[idx].classList.remove('active');
-            // Navegación infinita (loop)
             imgs[(idx + step + imgs.length) % imgs.length].classList.add('active');
         }
 
+        // --- LÓGICA DE MODAL Y ZOOM ---
         function openModal(btn, e) {
             e.stopPropagation();
             const activa = btn.closest('.img-container').querySelector('.preview-img.active');
-            document.getElementById('fullImage').src = activa.src;
+            const fullImg = document.getElementById('fullImage');
+            fullImg.src = activa.src;
+            fullImg.classList.remove('zoomed'); // Reset zoom al abrir
             document.getElementById('imageModal').style.display = 'flex';
         }
 
@@ -223,26 +198,29 @@
             document.getElementById('imageModal').style.display = 'none';
         }
 
+        function toggleZoom(e) {
+            e.stopPropagation();
+            e.target.classList.toggle('zoomed');
+        }
+
         function askDonation(e) {
             e.stopPropagation();
             const imgUrl = document.getElementById('fullImage').src;
             Swal.fire({
                 title: '¿Deseas apoyar el proyecto?',
-                text: "Tu donación voluntaria nos ayuda a seguir capturando nuestra biodiversidad.",
+                text: "Tu donación voluntaria ayuda a proteger nuestros bosques.",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonText: 'Donar y Descargar',
-                cancelButtonText: 'Solo Descargar Gratis',
+                cancelButtonText: 'Descargar Gratis',
                 confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#78716c'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.open('TU_LINK_DE_PAYPAL', '_blank');
                 }
-                // Proceso de descarga
                 const link = document.createElement('a');
                 link.href = imgUrl;
-                link.download = 'Naturaleza_Honduras.jpg';
+                link.download = 'Bosque_Honduras.jpg';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
