@@ -29,8 +29,19 @@
         
         .hidden-card { display: none !important; }
 
-        /* Ajuste para que SweetAlert no se vea pequeño dentro del modal */
+        /* SweetAlert al frente siempre */
         .swal2-container { z-index: 10000 !important; }
+
+        /* Botones de navegación modal */
+        .nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.1); color: white; border-radius: 50%;
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; transition: all 0.3s; z-index: 100;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.3); scale: 1.1; }
+        .btn-prev { left: 20px; }
+        .btn-next { right: 20px; }
     </style>
 </head>
 <body class="bg-stone-100 p-4 pt-48 md:pt-32">
@@ -113,12 +124,20 @@
     </main>
 
     <div id="imageModal" onclick="closeModal(event)">
-        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
+        <span class="absolute top-5 right-10 text-white text-5xl cursor-pointer hover:text-green-400 z-[110]" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
+        
+        <button class="nav-btn btn-prev" onclick="navigateModal(-1, event)">❮</button>
+        <button class="nav-btn btn-next" onclick="navigateModal(1, event)">❯</button>
+
         <img id="fullImage" src="" onclick="event.stopPropagation()">
-        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-500 transition-colors">Descargar Foto</button>
+        
+        <button onclick="askDonation(event)" class="mt-5 bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-500 transition-colors z-[110]">Descargar Foto</button>
     </div>
 
     <script>
+        let currentModalImages = []; // Lista de URLs de imágenes visibles
+        let currentIndex = 0; // Índice de la imagen actual en el modal
+
         window.addEventListener('DOMContentLoaded', () => {
             const tarjetas = document.querySelectorAll('.photo-card');
             const selectAnio = document.getElementById('yearFilter');
@@ -132,6 +151,15 @@
                 opt.value = anio;
                 opt.textContent = anio;
                 selectAnio.appendChild(opt);
+            });
+
+            // Soporte teclado
+            window.addEventListener('keydown', (e) => {
+                if (document.getElementById('imageModal').style.display === 'flex') {
+                    if (e.key === "ArrowRight") navigateModal(1);
+                    if (e.key === "ArrowLeft") navigateModal(-1);
+                    if (e.key === "Escape") document.getElementById('imageModal').style.display = 'none';
+                }
             });
         });
 
@@ -164,12 +192,35 @@
             imgs[nextIdx].classList.add('active');
         }
 
+        // Abrir modal y capturar todas las imágenes visibles para navegar
         function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const activeImg = container.querySelector('.preview-img.active');
-            document.getElementById('fullImage').src = activeImg.src;
+            if(e) e.stopPropagation();
+            
+            // Recopilar todas las imágenes de tarjetas NO ocultas por el filtro
+            const visibleCards = document.querySelectorAll('.photo-card:not(.hidden-card)');
+            currentModalImages = [];
+            
+            visibleCards.forEach(card => {
+                // Tomamos la imagen que esté activa en el slider de esa tarjeta
+                const activeImg = card.querySelector('.preview-img.active');
+                if(activeImg) currentModalImages.push(activeImg.src);
+            });
+
+            const currentSrc = btn.closest('.img-container').querySelector('.preview-img.active').src;
+            currentIndex = currentModalImages.indexOf(currentSrc);
+
+            updateModalContent();
             document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function updateModalContent() {
+            document.getElementById('fullImage').src = currentModalImages[currentIndex];
+        }
+
+        function navigateModal(step, e) {
+            if(e) e.stopPropagation();
+            currentIndex = (currentIndex + step + currentModalImages.length) % currentModalImages.length;
+            updateModalContent();
         }
 
         function closeModal(e) {
@@ -180,12 +231,11 @@
 
         function askDonation(e) {
             e.stopPropagation();
-            // LA CLAVE: Usamos 'target' para que el mensaje se renderice dentro del modal
             Swal.fire({
                 title: '¿Quieres descargar la foto?',
                 text: "Puedes apoyarnos con una donación o descargar gratis.",
                 icon: 'question',
-                target: document.getElementById('imageModal'), // Esto lo pone al frente
+                target: document.getElementById('imageModal'),
                 showCancelButton: true,
                 confirmButtonColor: '#059669',
                 cancelButtonColor: '#6b7280',
