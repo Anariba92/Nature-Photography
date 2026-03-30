@@ -6,7 +6,6 @@
     <title>Wild Life Honduras</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Contenedor principal: Diseño limpio y estable */
         .card-container {
             position: relative;
             height: 440px;
@@ -31,7 +30,7 @@
             object-fit: cover;
         }
 
-        /* CAPA DE INFORMACIÓN: Aparece sobre la imagen */
+        /* CAPA DE INFORMACIÓN */
         .info-overlay {
             position: absolute;
             inset: 0;
@@ -43,16 +42,16 @@
             align-items: center;
             padding: 25px;
             text-align: center;
-            z-index: 100; /* Debajo del botón de zoom, pero encima de la foto */
+            z-index: 100;
         }
         .info-overlay.active { display: flex; }
 
-        /* BOTÓN DE EXPANSIÓN: El "intocable" */
+        /* EL BOTÓN VERDE (Corregido con Z-Index alto) */
         .btn-zoom {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: #16a34a !important; /* Verde vibrante */
+            background: #16a34a !important;
             color: white;
             width: 46px;
             height: 46px;
@@ -60,15 +59,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 500; /* Prioridad máxima absoluta */
+            z-index: 500; /* Prioridad alta para el clic */
             cursor: pointer;
             border: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: transform 0.2s;
         }
-        .btn-zoom:hover { transform: scale(1.1); }
 
-        /* Botón de texto inferior */
         .btn-info {
             flex-grow: 1;
             background: #f9fafb;
@@ -78,20 +74,17 @@
             font-weight: 800;
             color: #064e3b;
             text-transform: uppercase;
-            letter-spacing: 1px;
             cursor: pointer;
             border: none;
             border-top: 1px solid #eee;
         }
-        .btn-info:hover { background: #f3f4f6; }
 
-        /* Modal para ver la foto en grande */
         #imageModal { 
             display: none; 
             position: fixed; 
             inset: 0; 
             background: rgba(0,0,0,0.95); 
-            z-index: 10000; 
+            z-index: 99999; /* Máxima prioridad */
             align-items: center; 
             justify-content: center; 
         }
