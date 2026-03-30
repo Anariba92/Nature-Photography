@@ -6,24 +6,27 @@
     <title>Wild Life Honduras</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Contenedor principal con altura automática para que quepa el texto */
         .card-container {
             position: relative;
-            height: 440px;
             background: white;
             border-radius: 1.25rem;
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .card-container:hover {
+            transform: translateY(-5px);
         }
 
-        /* El contenedor de la imagen ahora es relativo para el overlay */
+        /* Caja de la imagen */
         .img-box {
             width: 100%;
-            height: 320px;
+            height: 280px;
             position: relative;
             background: #000;
-            overflow: hidden;
         }
 
         .slide-img {
@@ -32,66 +35,57 @@
             object-fit: cover;
         }
 
-        /* CAPA DE INFORMACIÓN: Z-index medio */
-        .info-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(6, 78, 59, 0.98);
-            color: white;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 25px;
-            text-align: center;
-            z-index: 40; /* Por debajo del botón verde */
-        }
-        .info-overlay.active { display: flex; }
-
-        /* EL BOTÓN VERDE: Ahora es independiente de la caja de imagen */
+        /* Botón de Zoom con alta prioridad */
         .btn-zoom {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 12px;
+            right: 12px;
             background: #16a34a !important;
             color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 100; /* Prioridad máxima dentro de la tarjeta */
+            z-index: 50;
             cursor: pointer;
             border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            /* Importante para móviles: evita que el click se pase al fondo */
-            touch-action: manipulation; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .btn-info {
-            flex-grow: 1;
-            background: #f9fafb;
-            width: 100%;
-            padding: 15px;
-            text-align: center;
-            font-weight: 800;
+        /* Pie de página con la información técnica */
+        .card-footer {
+            padding: 1.25rem;
+            background: white;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .species-title {
             color: #064e3b;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
             text-transform: uppercase;
-            cursor: pointer;
-            border: none;
-            border-top: 1px solid #eee;
         }
 
-        /* Modal con prioridad absoluta */
+        .species-desc {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        /* Modal para pantalla completa */
         #imageModal { 
             display: none; 
             position: fixed; 
             inset: 0; 
             background: rgba(0,0,0,0.95); 
-            z-index: 99999; 
+            z-index: 10000; 
             align-items: center; 
             justify-content: center; 
+            padding: 20px;
         }
     </style>
 </head>
@@ -101,55 +95,44 @@
         <h1 class="font-black text-green-900 text-xl tracking-tighter uppercase">Wild Life Honduras</h1>
     </nav>
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-24">
         
-        <div class="card-container" id="c1">
-            <button class="btn-zoom" onclick="verImagen('img/mariposa1.jpg', event)">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            </button>
-
+        <div class="card-container">
             <div class="img-box">
-                <div class="info-overlay" id="info1" onclick="this.classList.remove('active')">
-                    <p class="text-lg italic">"Siproeta stelenes: Mariposa Malaquita. Muy común en zonas húmedas de Honduras."</p>
-                    <p class="mt-6 text-xs bg-white/20 px-3 py-1 rounded-full uppercase font-bold">Cerrar</p>
-                </div>
-                <img src="img/mariposa1.jpg" class="slide-img">
+                <button class="btn-zoom" onclick="verImagen('img/mariposa1.jpg')">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+                <img src="img/mariposa1.jpg" class="slide-img" alt="Mariposa Malaquita">
             </div>
             
-            <button class="btn-info" onclick="document.getElementById('info1').classList.add('active')">
-                MARIPOSA MALAQUITA ❯
-            </button>
+            <div class="card-footer">
+                <h2 class="species-title">Mariposa Malaquita</h2>
+                <p class="species-desc">"Siproeta stelenes: Muy común en zonas húmedas de Honduras. Destaca por sus colores verdes translúcidos."</p>
+            </div>
         </div>
 
-        <div class="card-container" id="c2">
-            <button class="btn-zoom" onclick="verImagen('img/chinche.jpg', event)">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            </button>
-
+        <div class="card-container">
             <div class="img-box">
-                <div class="info-overlay" id="info2" onclick="this.classList.remove('active')">
-                    <p class="text-lg italic">"Chinche depredadora: Control natural de plagas en cafetales hondureños."</p>
-                    <p class="mt-6 text-xs bg-white/20 px-3 py-1 rounded-full uppercase font-bold">Cerrar</p>
-                </div>
-                <img src="img/chinche.jpg" class="slide-img">
+                <button class="btn-zoom" onclick="verImagen('img/chinche.jpg')">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+                <img src="img/chinche.jpg" class="slide-img" alt="Chinche de Campo">
             </div>
             
-            <button class="btn-info" onclick="document.getElementById('info2').classList.add('active')">
-                CHINCHE DE CAMPO ❯
-            </button>
+            <div class="card-footer">
+                <h2 class="species-title">Chinche de Campo</h2>
+                <p class="species-desc">"Hemiptera: Importante controlador biológico de plagas en los ecosistemas locales."</p>
+            </div>
         </div>
 
-    </main>
+        </main>
 
     <div id="imageModal" onclick="this.style.display='none'">
-        <img id="modalImg" class="max-w-[95%] max-h-[85vh] rounded shadow-2xl">
+        <img id="modalImg" class="max-w-full max-h-full rounded-lg shadow-2xl">
     </div>
 
     <script>
-        function verImagen(src, event) {
-            // Detenemos que el click active otras cosas por accidente
-            if(event) event.stopPropagation();
-            
+        function verImagen(src) {
             const m = document.getElementById('imageModal');
             document.getElementById('modalImg').src = src;
             m.style.display = 'flex';
