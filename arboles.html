@@ -9,25 +9,10 @@
     <style>
         body.modal-open { overflow: hidden; }
 
-        .img-container { 
-            height: 320px; 
-            overflow: hidden; 
-            position: relative; 
-            background: #1a1a1a; 
-            border-radius: 1rem 1rem 0 0; 
-        }
-        
-        .preview-img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            position: absolute; transition: opacity 0.4s ease; 
-            opacity: 0; z-index: 1;
-        }
-        .preview-img.active { opacity: 1; z-index: 2; }
-        
-        /* TARJETA 3D */
+        /* Estenedor de imagen con perspectiva */
         .photo-card { 
             perspective: 1500px; 
-            height: 450px; 
+            height: 460px; 
             position: relative; 
         }
 
@@ -45,6 +30,7 @@
             -webkit-backface-visibility: hidden;
             position: absolute; inset: 0; border-radius: 1rem; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
         .back-card { 
@@ -53,27 +39,47 @@
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             padding: 2rem; text-align: center;
+            z-index: 2;
         }
 
-        /* BOTONES DE CONTROL */
-        .nav-btn-action {
+        .img-container { 
+            height: 340px; 
+            position: relative; 
+            background: #1a1a1a;
+        }
+        
+        .preview-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            position: absolute; inset: 0; transition: opacity 0.4s ease; 
+            opacity: 0; z-index: 1;
+        }
+        .preview-img.active { opacity: 1; z-index: 2; }
+
+        /* CAPA DE BOTONES: Esta capa no gira, siempre está al frente */
+        .ui-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 50; /* Supervivencia total en navegador y móvil */
+            pointer-events: none; /* Deja pasar el clic a la tarjeta para girar */
+        }
+
+        .ui-layer button {
+            pointer-events: auto; /* Los botones sí capturan el clic */
             position: absolute;
             background: rgba(0, 0, 0, 0.6);
-            color: white; border: none; cursor: pointer;
+            color: white; border: none;
             display: flex; align-items: center; justify-content: center;
-            z-index: 50; /* Supervivencia en navegador */
             transition: all 0.2s;
         }
-        .nav-btn-action:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
 
-        .arrow-btn { top: 140px; width: 42px; height: 42px; border-radius: 50%; }
-        .btn-left { left: 10px; }
-        .btn-right { right: 10px; }
+        .ui-layer button:hover { background: rgba(0,0,0,0.9); transform: scale(1.05); }
 
-        .expand-btn {
-            top: 10px; right: 10px;
-            width: 44px; height: 44px; border-radius: 10px;
-            background: #16a34a;
+        .btn-prev { top: 150px; left: 10px; width: 40px; height: 40px; border-radius: 50%; }
+        .btn-next { top: 150px; right: 10px; width: 40px; height: 40px; border-radius: 50%; }
+        
+        .btn-expand { 
+            top: 10px; right: 10px; width: 45px; height: 45px; 
+            border-radius: 12px; background: #16a34a; 
         }
 
         /* MODAL */
@@ -82,12 +88,12 @@
             background: rgba(0,0,0,0.95); z-index: 10000; 
             align-items: center; justify-content: center; flex-direction: column; 
         }
-        
+
         @media (max-width: 768px) {
-            body { padding-top: 220px; }
+            body { padding-top: 240px; }
             .photo-card { height: 420px; }
-            .img-container { height: 280px; }
-            .arrow-btn { top: 120px; }
+            .img-container { height: 300px; }
+            .btn-prev, .btn-next { top: 130px; }
         }
     </style>
 </head>
@@ -97,12 +103,12 @@
         <div class="max-w-7xl mx-auto flex flex-col gap-4">
             <div class="flex justify-between items-center">
                 <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm">❮ MENÚ</a>
-                <span class="font-black text-green-800 uppercase tracking-widest">Wild Life</span>
+                <span class="font-black text-green-800 uppercase tracking-widest">Wild Life Honduras</span>
             </div>
             <div class="flex gap-2">
-                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="¿Qué buscas?" class="flex-1 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar animal..." class="flex-1 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
                 <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white">
-                    <option value="all">Año</option>
+                    <option value="all">Años</option>
                 </select>
             </div>
         </div>
@@ -111,19 +117,21 @@
     <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
         
         <div class="photo-card" data-name="mariposa" data-year="2026">
-            <div class="inner-card">
-                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+            <div class="ui-layer">
+                <button onclick="changeSlide(this, -1)" class="btn-prev">❮</button>
+                <button onclick="changeSlide(this, 1)" class="btn-next">❯</button>
+                <button onclick="openModal(this)" class="btn-expand">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+            </div>
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/mariposa1.jpg" class="preview-img active">
-                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
-                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
-                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
-                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                        </button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Mariposa Malaquita</div>
                 </div>
-                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+                <div class="back-card">
                     <p class="italic text-lg">"Especie neotropical cuyos colores resaltan por verde lima o amarillentos"</p>
                     <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
@@ -131,20 +139,22 @@
         </div>
 
         <div class="photo-card" data-name="chinche" data-year="2026">
-            <div class="inner-card">
-                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+            <div class="ui-layer">
+                <button onclick="changeSlide(this, -1)" class="btn-prev">❮</button>
+                <button onclick="changeSlide(this, 1)" class="btn-next">❯</button>
+                <button onclick="openModal(this)" class="btn-expand">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+            </div>
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/chinche.jpg" class="preview-img active">
                         <img src="img/chinche1.jpg" class="preview-img">
-                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
-                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
-                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
-                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                        </button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Chinche</div>
                 </div>
-                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+                <div class="back-card">
                     <p class="italic text-lg">"Insecto depredador que se alimenta de otros insectos pequeños."</p>
                     <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
@@ -152,20 +162,22 @@
         </div>
 
         <div class="photo-card" data-name="escarabajo" data-year="2026">
-            <div class="inner-card">
-                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+            <div class="ui-layer">
+                <button onclick="changeSlide(this, -1)" class="btn-prev">❮</button>
+                <button onclick="changeSlide(this, 1)" class="btn-next">❯</button>
+                <button onclick="openModal(this)" class="btn-expand">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+            </div>
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
                     <div class="img-container">
                         <img src="img/mariquita.jpg" class="preview-img active">
-                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
-                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
-                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
-                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                        </button>
                     </div>
                     <div class="p-4 text-center font-bold text-green-900 uppercase">Escarabajo Pulga</div>
                 </div>
-                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
-                    <p class="italic text-lg">"Caracterizados por tener patas traseras que les permiten saltar."</p>
+                <div class="back-card">
+                    <p class="italic text-lg">"Patas traseras muy desarrolladas que les permiten saltar."</p>
                     <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
@@ -191,9 +203,10 @@
             const years = [...new Set(Array.from(cards).map(c => c.dataset.year))];
             years.sort().reverse().forEach(y => select.add(new Option(y, y)));
             
+            // Ocultar botones de navegación si hay solo 1 foto
             cards.forEach(card => {
                 if(card.querySelectorAll('.preview-img').length <= 1) {
-                    card.querySelectorAll('.arrow-btn').forEach(b => b.remove());
+                    card.querySelectorAll('.btn-prev, .btn-next').forEach(b => b.remove());
                 }
             });
         };
@@ -233,27 +246,3 @@
                 c.style.display = (text && year) ? 'block' : 'none';
             });
         }
-
-        function askDonation() {
-            Swal.fire({
-                title: '¿Deseas descargar la imagen?',
-                text: "Wild Life Honduras",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Donar y Descargar',
-                cancelButtonText: 'Descargar Gratis',
-                confirmButtonColor: '#16a34a'
-            }).then((res) => {
-                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
-                    const a = document.createElement('a');
-                    a.href = document.getElementById('fullImage').src;
-                    a.download = 'wildlife_photo.jpg';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }
-            });
-        }
-    </script>
-</body>
-</html>
