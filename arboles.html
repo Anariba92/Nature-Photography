@@ -3,150 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wild Life Honduras</title>
+    <title>Álbum Animales | Wild Life</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .card-container {
-            position: relative;
-            height: 440px;
-            background: white;
-            border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
+        body.modal-open { overflow: hidden; }
+
+        /* Contenedor de imagen */
+        .img-container { 
+            height: 320px; 
+            overflow: hidden; 
+            position: relative; 
+            background: #1a1a1a; 
+            border-radius: 1rem 1rem 0 0; 
+            z-index: 10;
+        }
+        
+        .preview-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            position: absolute; transition: opacity 0.4s ease; 
+            opacity: 0; z-index: 1;
+        }
+        .preview-img.active { opacity: 1; z-index: 5; }
+        
+        /* Efecto 3D Robusto */
+        .photo-card { 
+            perspective: 1500px; 
+            height: 450px; 
+            position: relative; 
+            user-select: none;
         }
 
-        .img-box {
-            width: 100%;
-            height: 320px;
-            position: relative;
-            background: #000;
+        .inner-card { 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            position: relative; width: 100%; height: 100%;
+        }
+        
+        /* Girar */
+        .photo-card.flipped .inner-card { transform: rotateY(180deg); }
+        
+        .front-card, .back-card { 
+            backface-visibility: hidden; 
+            -webkit-backface-visibility: hidden;
+            position: absolute; inset: 0; border-radius: 1rem; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        .slide-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .back-card { 
+            transform: rotateY(180deg);
+            background: #064e3b; color: white; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 2rem; text-align: center;
+            z-index: 20;
         }
 
-        /* CAPA DE INFORMACIÓN */
-        .info-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(6, 78, 59, 0.98);
-            color: white;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 25px;
-            text-align: center;
-            z-index: 100;
+        /* Botones de Navegación Prioritarios */
+        .controls-overlay {
+            position: absolute; inset: 0; z-index: 50; pointer-events: none;
         }
-        .info-overlay.active { display: flex; }
-
-        /* EL BOTÓN VERDE (Corregido con Z-Index alto) */
-        .btn-zoom {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #16a34a !important;
-            color: white;
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 500; /* Prioridad alta para el clic */
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        
+        .nav-btn-action {
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.6);
+            color: white; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.3s;
         }
 
-        .btn-info {
-            flex-grow: 1;
-            background: #f9fafb;
-            width: 100%;
-            padding: 15px;
-            text-align: center;
-            font-weight: 800;
-            color: #064e3b;
-            text-transform: uppercase;
-            cursor: pointer;
-            border: none;
-            border-top: 1px solid #eee;
+        .arrow-btn {
+            position: absolute; top: 140px; width: 45px; height: 45px; border-radius: 50%;
+        }
+        .btn-left { left: 10px; }
+        .btn-right { right: 10px; }
+
+        .expand-btn {
+            position: absolute; top: 10px; right: 10px;
+            width: 45px; height: 45px; border-radius: 12px;
+            background: #16a34a;
         }
 
+        /* Modal */
         #imageModal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.95); 
-            z-index: 99999; /* Máxima prioridad */
-            align-items: center; 
-            justify-content: center; 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); z-index: 10000; 
+            align-items: center; justify-content: center; flex-direction: column; 
+        }
+        
+        @media (max-width: 768px) {
+            body { padding-top: 220px; }
+            .photo-card { height: 420px; }
+            .img-container { height: 300px; }
+            .arrow-btn { top: 130px; }
         }
     </style>
 </head>
 <body class="bg-stone-100 p-4">
 
-    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-sm border-b z-[1000] p-4 text-center">
-        <h1 class="font-black text-green-900 text-xl tracking-tighter uppercase">Wild Life Honduras</h1>
+    <nav class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md border-b z-[100] p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm">❮ MENÚ</a>
+                <span class="font-black text-green-800 tracking-tighter">WILD LIFE</span>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="Buscar animal..." class="flex-1 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
+                <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white">
+                    <option value="all">Año</option>
+                </select>
+            </div>
+        </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
         
-        <div class="card-container" id="c1">
-            <button class="btn-zoom" onclick="verImagen('img/mariposa1.jpg')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            </button>
-
-            <div class="info-overlay" id="info1" onclick="this.classList.remove('active')">
-                <p class="text-lg italic">"Siproeta stelenes: Mariposa Malaquita. Muy común en zonas húmedas de Honduras."</p>
-                <p class="mt-6 text-xs bg-white/20 px-3 py-1 rounded-full">Click para cerrar</p>
-            </div>
-
-            <div class="img-box">
-                <img src="img/mariposa1.jpg" class="slide-img">
+        <div class="photo-card" data-name="mariposa" data-year="2026">
+            <div class="controls-overlay">
+                <button onclick="changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                <button onclick="changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                <button onclick="openModal(this)" class="nav-btn-action expand-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6M9 21l-6-6M21 3v6h-6M3 21v-6h6M21 3l-6 6M3 21l6-6"/></svg>
+                </button>
             </div>
             
-            <button class="btn-info" onclick="document.getElementById('info1').classList.add('active')">
-                MARIPOSA MALAQUITA ❯
-            </button>
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/mariposa1.jpg" class="preview-img active">
+                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Mariposa Malaquita</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"Conocido como mariposa malaquita especie neotropical cuyos colores resaltan por verde lima o amarillentos"</p>
+                    <span class="text-xs mt-6 bg-white/20 px-3 py-1 rounded-full">AÑO: 2026</span>
+                </div>
+            </div>
         </div>
 
-        <div class="card-container" id="c2">
-            <button class="btn-zoom" onclick="verImagen('img/chinche.jpg')">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            </button>
-
-            <div class="info-overlay" id="info2" onclick="this.classList.remove('active')">
-                <p class="text-lg italic">"Chinche depredadora: Control natural de plagas en cafetales hondureños."</p>
-                <p class="mt-6 text-xs bg-white/20 px-3 py-1 rounded-full">Click para cerrar</p>
+        <div class="photo-card" data-name="chinche" data-year="2026">
+            <div class="controls-overlay">
+                <button onclick="changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                <button onclick="changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                <button onclick="openModal(this)" class="nav-btn-action expand-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6M9 21l-6-6M21 3v6h-6M3 21v-6h6M21 3l-6 6M3 21l6-6"/></svg>
+                </button>
             </div>
-
-            <div class="img-box">
-                <img src="img/chinche.jpg" class="slide-img">
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/chinche.jpg" class="preview-img active">
+                        <img src="img/chinche1.jpg" class="preview-img">
+                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Chinche</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"Es un insecto depredador que se alimenta de otros insectos pequeños."</p>
+                    <span class="text-xs mt-6 bg-white/20 px-3 py-1 rounded-full">AÑO: 2026</span>
+                </div>
             </div>
-            
-            <button class="btn-info" onclick="document.getElementById('info2').classList.add('active')">
-                CHINCHE DE CAMPO ❯
-            </button>
+        </div>
+
+        <div class="photo-card" data-name="escarabajo" data-year="2026">
+            <div class="controls-overlay">
+                <button onclick="changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                <button onclick="changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                <button onclick="openModal(this)" class="nav-btn-action expand-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 3 6 6M9 21l-6-6M21 3v6h-6M3 21v-6h6M21 3l-6 6M3 21l6-6"/></svg>
+                </button>
+            </div>
+            <div class="inner-card" onclick="this.parentElement.classList.toggle('flipped')">
+                <div class="front-card bg-white">
+                    <div class="img-container">
+                        <img src="img/mariquita.jpg" class="preview-img active">
+                    </div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Escarabajo Pulga</div>
+                </div>
+                <div class="back-card">
+                    <p class="italic text-lg">"Patas traseras muy desarrolladas que les permiten saltar."</p>
+                    <span class="text-xs mt-6 bg-white/20 px-3 py-1 rounded-full">AÑO: 2026</span>
+                </div>
+            </div>
         </div>
 
     </main>
 
-    <div id="imageModal" onclick="this.style.display='none'">
-        <img id="modalImg" class="max-w-[95%] max-h-[85vh] rounded shadow-2xl">
+    <div id="imageModal" onclick="this.style.display='none'; document.body.classList.remove('modal-open')">
+        <span class="absolute top-5 right-6 text-white text-5xl">&times;</span>
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 text-white rounded-full" onclick="event.stopPropagation(); navigateModal(-1)">❮</button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 text-white rounded-full" onclick="event.stopPropagation(); navigateModal(1)">❯</button>
+        <img id="fullImage" src="" class="max-w-[90%] max-height-[70vh] rounded-lg" onclick="event.stopPropagation()">
+        <button onclick="event.stopPropagation(); askDonation()" class="mt-8 bg-green-600 text-white px-8 py-3 rounded-full font-bold">Descargar</button>
     </div>
 
     <script>
-        function verImagen(src) {
-            const m = document.getElementById('imageModal');
-            document.getElementById('modalImg').src = src;
-            m.style.display = 'flex';
+        let currentModalImages = [];
+        let currentModalIdx = 0;
+
+        window.onload = () => {
+            const cards = document.querySelectorAll('.photo-card');
+            const select = document.getElementById('yearFilter');
+            const years = [...new Set(Array.from(cards).map(c => c.dataset.year))];
+            years.sort().reverse().forEach(y => select.add(new Option(y, y)));
+            
+            // Ocultar flechas si solo hay una imagen
+            cards.forEach(card => {
+                if(card.querySelectorAll('.preview-img').length <= 1) {
+                    card.querySelectorAll('.arrow-btn').forEach(b => b.style.display = 'none');
+                }
+            });
+        };
+
+        function changeSlide(btn, step) {
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[idx].classList.remove('active');
+            let next = (idx + step + imgs.length) % imgs.length;
+            imgs[next].classList.add('active');
+        }
+
+        function openModal(btn) {
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            currentModalImages = Array.from(imgs).map(i => i.src);
+            currentModalIdx = Array.from(imgs).findIndex(i => i.classList.contains('active'));
+            
+            document.getElementById('fullImage').src = currentModalImages[currentModalIdx];
+            document.getElementById('imageModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+
+        function navigateModal(step) {
+            currentModalIdx = (currentModalIdx + step + currentModalImages.length) % currentModalImages.length;
+            document.getElementById('fullImage').src = currentModalImages[currentModalIdx];
+        }
+
+        function filtrarContenido() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const y = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(c => {
+                const text = c.dataset.name.toLowerCase().includes(q);
+                const year = y === 'all' || c.dataset.year === y;
+                c.style.display = (text && year) ? 'block' : 'none';
+            });
+        }
+
+        function askDonation() {
+            Swal.fire({
+                title: '¿Descargar?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Donar',
+                cancelButtonText: 'Gratis',
+                confirmButtonColor: '#16a34a'
+            }).then((res) => {
+                if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
+                    const a = document.createElement('a');
+                    a.href = document.getElementById('fullImage').src;
+                    a.download = 'wildlife.jpg';
+                    a.click();
+                }
+            });
         }
     </script>
 </body>
