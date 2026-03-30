@@ -3,164 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wild Life Honduras | Galería Pro</title>
+    <title>Wild Life Honduras | Galería Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* EFECTO REVEAL EN LAS TARJETAS */
         .card-container {
             background: white;
-            border-radius: 1.25rem;
+            border-radius: 1.5rem;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.5s ease;
         }
 
-        /* EFECTO REVELAR: Empieza corto y se expande */
         .img-box {
             width: 100%;
-            height: 200px; /* Altura inicial corta */
+            height: 220px; /* Altura inicial */
             position: relative;
             background: #000;
             overflow: hidden;
-            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: height 0.6s cubic-bezier(0.33, 1, 0.68, 1);
         }
+
         .card-container:hover .img-box {
-            height: 350px; /* Se expande al hover */
+            height: 380px; /* Expansión al pasar el mouse */
         }
 
         .slide-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.6s ease;
         }
 
-        /* Botón de Zoom */
+        .card-container:hover .slide-img {
+            transform: scale(1.05);
+        }
+
+        /* BOTÓN DE ZOOM (RETOQUE VISUAL) */
         .btn-zoom {
             position: absolute;
-            top: 12px;
-            right: 12px;
+            top: 15px;
+            right: 15px;
             background: #16a34a !important;
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 30;
+            z-index: 50;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Botones de acción */
-        .action-bar {
+        /* MODAL DE IMAGEN COMPLETA */
+        #fullImageModal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.98); 
+            z-index: 9999; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-controls {
+            margin-top: 20px;
             display: flex;
-            border-top: 1px solid #eee;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
         }
-        .btn-action {
-            flex: 1;
-            padding: 12px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-download { background: #064e3b; color: white; }
-        .btn-download:hover { background: #053a2c; }
 
-        /* MODAL DE DONACIÓN: El mensaje que NO se oculta */
+        /* MODAL DE DONACIÓN (EL MENSAJE QUE NO SE OCULTA) */
         #donationModal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             z-index: 10000;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            max-width: 400px;
-            text-align: center;
-        }
 
-        #fullImageModal { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); z-index: 9999; 
-            align-items: center; justify-content: center; 
+        .donation-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
     </style>
 </head>
-<body class="bg-stone-100 p-4">
+<body class="bg-stone-50 p-6">
 
-    <nav class="fixed top-0 left-0 w-full bg-white border-b z-[1000] p-4 text-center">
-        <h1 class="font-black text-green-900 text-xl uppercase tracking-tighter">Wild Life Honduras</h1>
+    <nav class="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b z-[1000] p-4 text-center">
+        <h1 class="font-black text-green-900 text-2xl uppercase tracking-tighter">Wild Life Honduras</h1>
     </nav>
 
-    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mt-24">
+    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 mt-24">
         
         <div class="card-container">
             <div class="img-box">
-                <div class="btn-zoom" onclick="verFull('img/mariposa1.jpg')">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <div class="btn-zoom" onclick="abrirVisor('img/mariposa1.jpg', 'Mariposa Malaquita')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                 </div>
                 <img src="img/mariposa1.jpg" class="slide-img">
             </div>
-            <div class="p-5">
-                <h2 class="font-bold text-green-900 text-lg uppercase">Mariposa Malaquita</h2>
-                <p class="text-sm text-gray-600 italic">Siproeta stelenes - Especie nativa.</p>
+            <div class="p-6 text-center">
+                <h2 class="font-black text-green-900 text-xl uppercase italic">Mariposa Malaquita</h2>
+                <p class="text-gray-500 text-sm mt-1">Siproeta stelenes • Honduras</p>
             </div>
-            <div class="action-bar">
-                <div class="btn-action btn-download" onclick="pedirDonacion('img/mariposa1.jpg')">
-                    DESCARGAR FOTO
+        </div>
+
+        <div class="card-container">
+            <div class="img-box">
+                <div class="btn-zoom" onclick="abrirVisor('img/chinche.jpg', 'Chinche de Campo')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                 </div>
+                <img src="img/chinche.jpg" class="slide-img">
+            </div>
+            <div class="p-6 text-center">
+                <h2 class="font-black text-green-900 text-xl uppercase italic">Chinche de Campo</h2>
+                <p class="text-gray-500 text-sm mt-1">Hemiptera • Fauna Local</p>
             </div>
         </div>
 
     </main>
 
+    <div id="fullImageModal">
+        <div class="absolute top-5 right-5 text-white cursor-pointer" onclick="cerrarVisor()">
+            <svg width="35" height="35" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </div>
+        
+        <img id="imgZoom" class="max-w-full max-h-[70vh] rounded-xl shadow-2xl border-4 border-white/10">
+        
+        <h3 id="txtZoom" class="text-white text-2xl font-bold mt-6 uppercase tracking-widest"></h3>
+
+        <div class="modal-controls">
+            <button onclick="prepararDescarga()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-black text-lg transition-colors shadow-lg">
+                DESCARGAR AHORA
+            </button>
+        </div>
+    </div>
+
     <div id="donationModal">
-        <div class="modal-content">
-            <h3 class="text-xl font-bold text-green-900 mb-2">¡Casi listo!</h3>
-            <p class="text-gray-600 mb-6">¿Te gustaría apoyar la conservación de la vida silvestre con una pequeña donación?</p>
-            <div class="flex gap-4">
-                <button onclick="finalizarDescarga(true)" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold">SÍ, DONAR</button>
-                <button onclick="finalizarDescarga(false)" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold">AHORA NO</button>
+        <div class="donation-content">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg width="30" height="30" class="text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <h3 class="text-2xl font-black text-green-900 mb-3">¿Deseas apoyar?</h3>
+            <p class="text-gray-600 mb-8 leading-relaxed">Tu aporte ayuda a documentar más especies de Honduras. ¿Te gustaría donar antes de descargar?</p>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="ejecutarDescarga(true)" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg shadow-md">SÍ, QUIERO DONAR</button>
+                <button onclick="ejecutarDescarga(false)" class="w-full bg-gray-100 text-gray-500 py-3 rounded-xl font-bold">NO, SOLO DESCARGAR</button>
             </div>
         </div>
     </div>
 
-    <div id="fullImageModal" onclick="this.style.display='none'">
-        <img id="imgZoom" class="max-w-[95%] max-h-[90vh] rounded-lg shadow-2xl">
-    </div>
-
     <script>
-        let imagenPendiente = '';
+        let rutaImagenActual = '';
 
-        function verFull(src) {
+        function abrirVisor(src, nombre) {
+            rutaImagenActual = src;
             document.getElementById('imgZoom').src = src;
+            document.getElementById('txtZoom').innerText = nombre;
             document.getElementById('fullImageModal').style.display = 'flex';
         }
 
-        function pedirDonacion(src) {
-            imagenPendiente = src;
+        function cerrarVisor() {
+            document.getElementById('fullImageModal').style.display = 'none';
+        }
+
+        function prepararDescarga() {
+            // Mostramos el modal de donación encima del visor
             document.getElementById('donationModal').style.display = 'flex';
         }
 
-        function finalizarDescarga(quiereDonar) {
+        function ejecutarDescarga(donar) {
             document.getElementById('donationModal').style.display = 'none';
             
-            if(quiereDonar) {
-                // Aquí podrías redirigir a PayPal o mostrar un QR
-                alert("¡Gracias por tu generosidad! Iniciando descarga...");
+            if(donar) {
+                alert("¡Gracias! Serás redirigido a la sección de apoyo tras la descarga.");
+                // Aquí podrías poner: window.open('tu_link_de_paypal', '_blank');
             }
 
-            // Lógica de descarga real
+            // Iniciar descarga automática
             const link = document.createElement('a');
-            link.href = imagenPendiente;
-            link.download = "WildLife_Honduras_Foto.jpg";
+            link.href = rutaImagenActual;
+            link.download = "WildLife_Honduras_FullRes.jpg";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
