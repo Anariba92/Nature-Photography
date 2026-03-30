@@ -6,123 +6,128 @@
     <title>Wild Life Honduras</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Contenedor estático, sin 3D para evitar bloqueos */
         .card-container {
             position: relative;
-            height: 460px;
-            perspective: 1000px;
-        }
-
-        /* La tarjeta que gira */
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            cursor: pointer;
-        }
-
-        .flipped .card-inner { transform: rotateY(180deg); }
-
-        .card-front, .card-back {
-            position: absolute;
-            inset: 0;
-            backface-visibility: hidden;
+            height: 420px;
+            background: white;
             border-radius: 1rem;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .card-back {
+        .img-box {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            background: #000;
+        }
+
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* CAPA DE INFORMACIÓN (Se muestra al hacer click en el texto) */
+        .info-overlay {
+            position: absolute;
+            inset: 0;
             background: #064e3b;
             color: white;
-            transform: rotateY(180deg);
+            display: none; /* Oculto por defecto */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .info-overlay.active { display: flex; }
+
+        /* BOTÓN DE EXPANSIÓN: Ahora es un elemento flotante simple */
+        .btn-zoom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #16a34a;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            z-index: 50; /* Prioridad máxima */
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .btn-info {
+            background: #f3f4f6;
+            width: 100%;
+            padding: 15px;
             text-align: center;
+            font-weight: bold;
+            color: #064e3b;
+            cursor: pointer;
+            border: none;
+            border-top: 1px solid #e5e7eb;
         }
-
-        /* Botón de expansión: Ahora fuera del área de conflicto 3D */
-        .btn-expandir {
-            position: absolute;
-            right: 15px;
-            bottom: 12px;
-            background: #16a34a;
-            color: white;
-            padding: 8px;
-            border-radius: 8px;
-            z-index: 100; /* Fuera del card-inner para que sea clickeable siempre */
-            transition: transform 0.2s;
-        }
-        .btn-expandir:hover { transform: scale(1.1); }
-
-        .img-box { width: 100%; height: 320px; background: #000; position: relative; }
-        
-        .slide-img {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        .slide-img.active { display: block; }
 
         #imageModal { 
             display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); z-index: 9999; 
+            background: rgba(0,0,0,0.9); z-index: 1000; 
             align-items: center; justify-content: center; 
         }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
 
-    <nav class="fixed top-0 left-0 w-full bg-white border-b z-[500] p-4 shadow-sm text-center">
-        <span class="font-black text-green-800 text-xl">WILD LIFE HONDURAS</span>
+    <nav class="fixed top-0 left-0 w-full bg-white border-b z-[500] p-4 text-center font-black text-green-800">
+        WILD LIFE HONDURAS
     </nav>
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
         
-        <div class="card-container" id="album1">
-            <button onclick="abrirModal('album1')" class="btn-expandir">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <div class="card-container" id="c1">
+            <button class="btn-zoom" onclick="verImagen('img/mariposa1.jpg')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
             </button>
 
-            <div class="card-inner" onclick="this.parentElement.classList.toggle('flipped')">
-                <div class="card-front bg-white">
-                    <div class="img-box">
-                        <img src="img/mariposa1.jpg" class="slide-img active">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-green-900 uppercase">Mariposa Malaquita</h3>
-                        <p class="text-xs text-gray-500">Honduras 2026</p>
-                    </div>
-                </div>
-                <div class="card-back">
-                    <p class="italic">"Reserva Biológica de Honduras"</p>
-                </div>
+            <div class="info-overlay" id="info1" onclick="this.classList.remove('active')">
+                <p class="text-lg italic">"Siproeta stelenes: Mariposa Malaquita. Muy común en zonas húmedas de Honduras."</p>
+                <p class="mt-4 text-xs opacity-70 text-white">Click para cerrar</p>
             </div>
+
+            <div class="img-box">
+                <img src="img/mariposa1.jpg" class="slide-img">
+            </div>
+            
+            <button class="btn-info" onclick="document.getElementById('info1').classList.add('active')">
+                MARIPOSA MALAQUITA ❯
+            </button>
         </div>
 
-        <div class="card-container" id="album2">
-            <button onclick="abrirModal('album2')" class="btn-expandir">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <div class="card-container" id="c2">
+            <button class="btn-zoom" onclick="verImagen('img/chinche.jpg')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
             </button>
 
-            <div class="card-inner" onclick="this.parentElement.classList.toggle('flipped')">
-                <div class="card-front bg-white">
-                    <div class="img-box">
-                        <img src="img/chinche.jpg" class="slide-img active">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-green-900 uppercase">Chinche</h3>
-                        <p class="text-xs text-gray-500">Honduras 2026</p>
-                    </div>
-                </div>
-                <div class="card-back">
-                    <p class="italic">"Insecto depredador natural"</p>
-                </div>
+            <div class="info-overlay" id="info2" onclick="this.classList.remove('active')">
+                <p class="text-lg italic">"Chinche depredadora: Control natural de plagas en cafetales."</p>
+                <p class="mt-4 text-xs opacity-70 text-white">Click para cerrar</p>
             </div>
+
+            <div class="img-box">
+                <img src="img/chinche.jpg" class="slide-img">
+            </div>
+            
+            <button class="btn-info" onclick="document.getElementById('info2').classList.add('active')">
+                CHINCHE DE CAMPO ❯
+            </button>
         </div>
 
     </main>
@@ -132,10 +137,8 @@
     </div>
 
     <script>
-        function abrirModal(id) {
-            const container = document.getElementById(id);
-            const imagenActiva = container.querySelector('.slide-img.active');
-            document.getElementById('modalImg').src = imagenActiva.src;
+        function verImagen(src) {
+            document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').style.display = 'flex';
         }
     </script>
