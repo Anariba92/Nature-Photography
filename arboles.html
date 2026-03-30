@@ -3,289 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álbum Bosques | Árboles</title>
+    <title>Álbum Animales | Wild Life</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .img-container { height: 380px; overflow: hidden; position: relative; background: #1a1a1a; border-radius: 1rem 1rem 0 0; }
-        .preview-img { 
-            width: 100%; height: 100%; object-fit: cover; object-position: center; 
-            position: absolute; transition: opacity 0.5s ease; 
-            z-index: 1; opacity: 0; 
-        }
-        .preview-img.active { opacity: 1; z-index: 10; }
-        
-        .photo-card { perspective: 1000px; height: 460px; }
-        .inner-card { 
-            transition: transform 0.8s; 
-            transform-style: preserve-3d; 
+        body.modal-open { overflow: hidden; }
+
+        .img-container { 
+            height: 320px; 
+            overflow: hidden; 
             position: relative; 
-            width: 100%; 
-            height: 100%; 
+            background: #1a1a1a; 
+            border-radius: 1rem 1rem 0 0; 
+        }
+        
+        .preview-img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            position: absolute; transition: opacity 0.4s ease; 
+            opacity: 0; z-index: 1;
+        }
+        .preview-img.active { opacity: 1; z-index: 2; }
+        
+        /* TARJETA 3D */
+        .photo-card { 
+            perspective: 1500px; 
+            height: 450px; 
+            position: relative; 
+        }
+
+        .inner-card { 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            position: relative; width: 100%; height: 100%;
             cursor: pointer;
         }
         
-        .flipped .inner-card { transform: rotateY(180deg); }
+        .photo-card.flipped .inner-card { transform: rotateY(180deg); }
         
         .front-card, .back-card { 
             backface-visibility: hidden; 
-            position: absolute; 
-            inset: 0; 
-            border-radius: 1rem; 
-            overflow: hidden; 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            -webkit-backface-visibility: hidden;
+            position: absolute; inset: 0; border-radius: 1rem; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        
+
         .back-card { 
-            transform: rotateY(180deg); 
-            background: #064e3b; 
-            color: white; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 2rem; 
-            text-align: center; 
+            transform: rotateY(180deg);
+            background: #064e3b; color: white; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 2rem; text-align: center;
+        }
+
+        /* BOTONES DE CONTROL */
+        .nav-btn-action {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.6);
+            color: white; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 50; /* Supervivencia en navegador */
+            transition: all 0.2s;
+        }
+        .nav-btn-action:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
+
+        .arrow-btn { top: 140px; width: 42px; height: 42px; border-radius: 50%; }
+        .btn-left { left: 10px; }
+        .btn-right { right: 10px; }
+
+        .expand-btn {
+            top: 10px; right: 10px;
+            width: 44px; height: 44px; border-radius: 10px;
+            background: #16a34a;
+        }
+
+        /* MODAL */
+        #imageModal { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); z-index: 10000; 
+            align-items: center; justify-content: center; flex-direction: column; 
         }
         
-        #imageModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
-        #fullImage { max-width: 90%; max-height: 75vh; object-fit: contain; }
-        
-        .hidden-card { display: none !important; }
-
-        /* FLECHAS DE NAVEGACIÓN EN TARJETAS */
-        .nav-arrow {
-            position: absolute; 
-            top: 50%; 
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.6); 
-            color: white; 
-            border-radius: 50%;
-            width: 40px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            z-index: 50; /* Muy por encima para que el clic funcione siempre */
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .nav-arrow:hover { background: rgba(0, 0, 0, 0.9); }
-        .arrow-left { left: 10px; }
-        .arrow-right { right: 10px; }
-
-        .nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(255,255,255,0.2); color: white; border-radius: 50%;
-            width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; transition: all 0.3s; z-index: 100;
-        }
-        .btn-prev { left: 15px; }
-        .btn-next { right: 15px; }
-
         @media (max-width: 768px) {
-            .img-container { height: 300px; }
-            .photo-card { height: 400px; }
             body { padding-top: 220px; }
+            .photo-card { height: 420px; }
+            .img-container { height: 280px; }
+            .arrow-btn { top: 120px; }
         }
     </style>
 </head>
-<body class="bg-stone-100 p-4 pt-48 md:pt-32">
+<body class="bg-stone-100 p-4">
 
-    <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md border-b z-[100] p-4 shadow-sm">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
-            <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-green-700 transition-all">
-                ❮ MENÚ
-            </a>
-            <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="¿Qué buscas?" 
-                    class="flex-1 md:w-64 px-4 py-2 rounded-xl border border-stone-300 outline-none focus:ring-2 focus:ring-green-600">
+    <nav class="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md border-b z-[100] p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="bg-green-900 text-white px-5 py-2 rounded-full font-bold text-sm">❮ MENÚ</a>
+                <span class="font-black text-green-800 uppercase tracking-widest">Wild Life</span>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="searchInput" oninput="filtrarContenido()" placeholder="¿Qué buscas?" class="flex-1 px-4 py-2 rounded-xl border border-stone-300 focus:ring-2 focus:ring-green-600 outline-none">
                 <select id="yearFilter" onchange="filtrarContenido()" class="px-4 py-2 rounded-xl border border-stone-300 bg-white">
-                    <option value="all">Todos los años</option>
+                    <option value="all">Año</option>
                 </select>
             </div>
         </div>
     </nav>
 
-    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <main id="albumGrid" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
         
-        <div class="photo-card" data-name="liquidambar arbol estrella" data-year="2026">
-            <div class="inner-card" onclick="handleFlip(this, event)">
-                <div class="front-card bg-white">
+        <div class="photo-card" data-name="mariposa" data-year="2026">
+            <div class="inner-card">
+                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
                     <div class="img-container">
-                        <img src="img/Pino.jpg" class="preview-img active">
-                        <img src="img/hoja.jpg" class="preview-img">
-                        <img src="img/tronco.jpg" class="preview-img">
-                        
-                        <button type="button" onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
-                        <button type="button" onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
-                        <button type="button" onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
+                        <img src="img/mariposa1.jpg" class="preview-img active">
+                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                        </button>
                     </div>
-                    <div class="p-4 text-center font-bold text-green-900 uppercase">Liquidámbar</div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Mariposa Malaquita</div>
                 </div>
-                <div class="back-card">
-                    <p class="italic text-lg">"Se puede encontrar en climas frescos de las montañas."</p>
-                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+                    <p class="italic text-lg">"Especie neotropical cuyos colores resaltan por verde lima o amarillentos"</p>
+                    <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="san juancito paisaje montaña" data-year="2026">
-            <div class="inner-card" onclick="handleFlip(this, event)">
-                <div class="front-card bg-white">
+        <div class="photo-card" data-name="chinche" data-year="2026">
+            <div class="inner-card">
+                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
                     <div class="img-container">
-                        <img src="img/montaña.jpg" class="preview-img active">
-                        <button type="button" onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
+                        <img src="img/chinche.jpg" class="preview-img active">
+                        <img src="img/chinche1.jpg" class="preview-img">
+                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                        </button>
                     </div>
-                    <div class="p-4 text-center font-bold text-green-900 uppercase">Sitio, San Juancito</div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Chinche</div>
                 </div>
-                <div class="back-card">
-                    <p class="italic text-lg">"Panorámica desde las alturas de la mina."</p>
-                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+                    <p class="italic text-lg">"Insecto depredador que se alimenta de otros insectos pequeños."</p>
+                    <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
 
-        <div class="photo-card" data-name="pino ocote pinabete bosque" data-year="2026">
-            <div class="inner-card" onclick="handleFlip(this, event)">
-                <div class="front-card bg-white">
+        <div class="photo-card" data-name="escarabajo" data-year="2026">
+            <div class="inner-card">
+                <div class="front-card bg-white" onclick="this.closest('.photo-card').classList.toggle('flipped')">
                     <div class="img-container">
-                        <img src="img/bosque.jpg" class="preview-img active">
-                        <img src="img/bellota.jpg" class="preview-img">
-                        
-                        <button type="button" onclick="changeSlide(this, -1, event)" class="nav-arrow arrow-left">❮</button>
-                        <button type="button" onclick="changeSlide(this, 1, event)" class="nav-arrow arrow-right">❯</button>
-                        <button type="button" onclick="openModal(this, event)" class="absolute top-2 right-2 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg">🔍</button>
+                        <img src="img/mariquita.jpg" class="preview-img active">
+                        <button onclick="event.stopPropagation(); changeSlide(this, -1)" class="nav-btn-action arrow-btn btn-left">❮</button>
+                        <button onclick="event.stopPropagation(); changeSlide(this, 1)" class="nav-btn-action arrow-btn btn-right">❯</button>
+                        <button onclick="event.stopPropagation(); openModal(this)" class="nav-btn-action expand-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                        </button>
                     </div>
-                    <div class="p-4 text-center font-bold text-green-900 uppercase">Pino Ocote</div>
+                    <div class="p-4 text-center font-bold text-green-900 uppercase">Escarabajo Pulga</div>
                 </div>
-                <div class="back-card">
-                    <p class="italic text-lg">"En Honduras podemos encontrar 7 especies de pinos."</p>
-                    <span class="text-xs mt-4 opacity-70">AÑO: 2026</span>
+                <div class="back-card" onclick="this.closest('.photo-card').classList.toggle('flipped')">
+                    <p class="italic text-lg">"Caracterizados por tener patas traseras que les permiten saltar."</p>
+                    <span class="text-xs mt-6 opacity-70">AÑO: 2026</span>
                 </div>
             </div>
         </div>
-        
+
     </main>
 
-    <div id="imageModal" onclick="closeModal(event)">
-        <span class="absolute top-5 right-6 text-white text-6xl cursor-pointer hover:text-green-400 z-[110]" onclick="closeModal(event)">&times;</span>
-        <button id="modalPrev" class="nav-btn btn-prev" onclick="navigateBlockModal(-1, event)">❮</button>
-        <button id="modalNext" class="nav-btn btn-next" onclick="navigateBlockModal(1, event)">❯</button>
-        <img id="fullImage" src="" onclick="event.stopPropagation()">
-        <button onclick="askDonation(event)" class="mt-8 bg-green-600 text-white px-10 py-4 rounded-full font-bold hover:bg-green-500 transition-colors z-[110] shadow-xl">Descargar Foto</button>
+    <div id="imageModal" onclick="this.style.display='none'; document.body.classList.remove('modal-open')">
+        <span class="absolute top-5 right-6 text-white text-5xl cursor-pointer">&times;</span>
+        <button class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 text-white rounded-full text-2xl" onclick="event.stopPropagation(); navigateModal(-1)">❮</button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 text-white rounded-full text-2xl" onclick="event.stopPropagation(); navigateModal(1)">❯</button>
+        <img id="fullImage" src="" class="max-w-[90%] max-h-[75vh] rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+        <button onclick="event.stopPropagation(); askDonation()" class="mt-8 bg-green-600 text-white px-10 py-3 rounded-full font-bold hover:bg-green-500 transition-colors">Descargar Foto</button>
     </div>
 
     <script>
-        let currentBlockImages = [];
-        let currentBlockIdx = 0;
+        let currentModalImages = [];
+        let currentModalIdx = 0;
 
-        function handleFlip(innerCard, e) {
-            // Si el clic viene de un botón (flecha o lupa), NO girar la carta
-            if (e.target.closest('button')) return;
-            const parentCard = innerCard.closest('.photo-card');
-            parentCard.classList.toggle('flipped');
-        }
-
-        function changeSlide(btn, step, e) {
-            e.stopPropagation(); // Evita que la carta gire
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
+        window.onload = () => {
+            const cards = document.querySelectorAll('.photo-card');
+            const select = document.getElementById('yearFilter');
+            const years = [...new Set(Array.from(cards).map(c => c.dataset.year))];
+            years.sort().reverse().forEach(y => select.add(new Option(y, y)));
             
-            // Buscar la imagen activa actual
-            let currentIdx = -1;
-            imgs.forEach((img, index) => {
-                if (img.classList.contains('active')) {
-                    currentIdx = index;
+            cards.forEach(card => {
+                if(card.querySelectorAll('.preview-img').length <= 1) {
+                    card.querySelectorAll('.arrow-btn').forEach(b => b.remove());
                 }
             });
+        };
 
-            if (currentIdx === -1) return;
-
-            // Quitar clase activa a la actual
-            imgs[currentIdx].classList.remove('active');
-
-            // Calcular nueva posición
-            let newIdx = (currentIdx + step + imgs.length) % imgs.length;
-
-            // Poner clase activa a la nueva
-            imgs[newIdx].classList.add('active');
+        function changeSlide(btn, step) {
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            let idx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            imgs[idx].classList.remove('active');
+            let next = (idx + step + imgs.length) % imgs.length;
+            imgs[next].classList.add('active');
         }
 
-        function openModal(btn, e) {
-            e.stopPropagation();
-            const container = btn.closest('.img-container');
-            const imgs = container.querySelectorAll('.preview-img');
-            currentBlockImages = Array.from(imgs).map(img => img.src);
-            currentBlockIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+        function openModal(btn) {
+            const card = btn.closest('.photo-card');
+            const imgs = card.querySelectorAll('.preview-img');
+            currentModalImages = Array.from(imgs).map(i => i.src);
+            currentModalIdx = Array.from(imgs).findIndex(i => i.classList.contains('active'));
             
-            document.getElementById('modalPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
-            document.getElementById('modalNext').style.display = imgs.length > 1 ? 'flex' : 'none';
-            
-            updateModal();
+            document.getElementById('fullImage').src = currentModalImages[currentModalIdx];
             document.getElementById('imageModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
 
-        function navigateBlockModal(step, e) {
-            e.stopPropagation();
-            currentBlockIdx = (currentBlockIdx + step + currentBlockImages.length) % currentBlockImages.length;
-            updateModal();
-        }
-
-        function updateModal() {
-            document.getElementById('fullImage').src = currentBlockImages[currentBlockIdx];
-        }
-
-        function closeModal(e) {
-            if (e.target.id === 'imageModal' || e.target.innerText === '×') {
-                document.getElementById('imageModal').style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
+        function navigateModal(step) {
+            if(currentModalImages.length <= 1) return;
+            currentModalIdx = (currentModalIdx + step + currentModalImages.length) % currentModalImages.length;
+            document.getElementById('fullImage').src = currentModalImages[currentModalIdx];
         }
 
         function filtrarContenido() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const year = document.getElementById('yearFilter').value;
-            document.querySelectorAll('.photo-card').forEach(card => {
-                const matchText = card.dataset.name.toLowerCase().includes(query);
-                const matchYear = year === 'all' || card.dataset.year === year;
-                card.classList.toggle('hidden-card', !(matchText && matchYear));
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const y = document.getElementById('yearFilter').value;
+            document.querySelectorAll('.photo-card').forEach(c => {
+                const text = c.dataset.name.toLowerCase().includes(q);
+                const year = y === 'all' || c.dataset.year === y;
+                c.style.display = (text && year) ? 'block' : 'none';
             });
         }
 
-        function askDonation(e) {
-            e.stopPropagation();
+        function askDonation() {
             Swal.fire({
-                title: '¿Descargar imagen?',
-                text: "Tu apoyo ayuda a conservar los bosques de Honduras.",
-                icon: 'info',
-                target: document.getElementById('imageModal'),
+                title: '¿Deseas descargar la imagen?',
+                text: "Wild Life Honduras",
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Donar y bajar',
-                cancelButtonText: 'Bajar gratis',
-                confirmButtonColor: '#059669'
+                confirmButtonText: 'Donar y Descargar',
+                cancelButtonText: 'Descargar Gratis',
+                confirmButtonColor: '#16a34a'
             }).then((res) => {
                 if (res.isConfirmed || res.dismiss === Swal.DismissReason.cancel) {
                     const a = document.createElement('a');
                     a.href = document.getElementById('fullImage').src;
-                    a.download = 'bosque-honduras.jpg';
+                    a.download = 'wildlife_photo.jpg';
+                    document.body.appendChild(a);
                     a.click();
+                    document.body.removeChild(a);
                 }
             });
         }
-
-        // Inicializar años
-        window.addEventListener('DOMContentLoaded', () => {
-            const tarjetas = document.querySelectorAll('.photo-card');
-            const selectAnio = document.getElementById('yearFilter');
-            const listaAnios = new Set();
-            tarjetas.forEach(t => listaAnios.add(t.dataset.year));
-            Array.from(listaAnios).sort().reverse().forEach(anio => {
-                if(anio) selectAnio.add(new Option(anio, anio));
-            });
-        });
     </script>
 </body>
 </html>
